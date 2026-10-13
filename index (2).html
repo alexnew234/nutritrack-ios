@@ -1,0 +1,2270 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <!-- Meta tags nativos para iOS Web App / PWA -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="NutriTrack">
+    <meta name="theme-color" content="#000000">
+    <title>NutriTrack PRO — iOS Edition</title>
+
+    <!-- Icono de pantalla de inicio para iOS generado en SVG Data URI -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%2309090b'/><circle cx='90' cy='90' r='62' fill='none' stroke='%2330D158' stroke-width='14' stroke-linecap='round' stroke-dasharray='290 400'/><circle cx='90' cy='90' r='44' fill='none' stroke='%23FF2D55' stroke-width='14' stroke-linecap='round' stroke-dasharray='200 350'/><circle cx='90' cy='90' r='26' fill='none' stroke='%230A84FF' stroke-width='14' stroke-linecap='round' stroke-dasharray='115 250'/></svg>">
+
+    <!-- Tailwind CSS & Phosphor Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        ios: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"SF Pro Text"', '"Helvetica Neue"', 'Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        ios: {
+                            bg: '#000000',
+                            card: '#1C1C1E',
+                            card2: '#2C2C2E',
+                            card3: '#3A3A3C',
+                            sep: '#38383A',
+                            green: '#30D158',
+                            pink: '#FF2D55',
+                            blue: '#0A84FF',
+                            orange: '#FF9F0A',
+                            purple: '#BF5AF2',
+                            teal: '#64D2FF',
+                            red: '#FF453A',
+                            gray: '#8E8E93',
+                            light: '#F2F2F7'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        * {
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+            background-color: #000000;
+            color: #FFFFFF;
+            margin: 0;
+            padding: 0;
+            overscroll-behavior-y: none;
+            user-select: none;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Evitar zoom accidental en Safari iOS (requiere >= 16px) */
+        input, select, textarea {
+            font-size: 16px !important;
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Ocultar scrollbars manteniendo desplazamiento suave */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Efecto Cristal Translúcido de iOS */
+        .ios-blur {
+            background: rgba(28, 28, 30, 0.78);
+            backdrop-filter: saturate(180%) blur(24px);
+            -webkit-backdrop-filter: saturate(180%) blur(24px);
+        }
+
+        .ios-nav-blur {
+            background: rgba(16, 16, 18, 0.84);
+            backdrop-filter: saturate(180%) blur(25px);
+            -webkit-backdrop-filter: saturate(180%) blur(25px);
+        }
+
+        /* Animación de los Anillos estilo Apple Fitness */
+        .fitness-ring {
+            transition: stroke-dashoffset 0.65s cubic-bezier(0.22, 1, 0.36, 1), stroke 0.3s ease;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        /* Transición tipo resorte para Bottom Sheets de iOS */
+        .sheet-backdrop {
+            transition: opacity 0.28s ease;
+        }
+        .sheet-content {
+            transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+
+        /* Botones táctiles con respuesta estilo iOS */
+        .ios-press {
+            transition: transform 0.14s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.14s ease;
+        }
+        .ios-press:active {
+            transform: scale(0.96);
+            opacity: 0.8;
+        }
+
+        /* Modo simulador de iPhone en escritorio vs Nativo en móvil */
+        @media (min-width: 768px) {
+            body.framed-mode {
+                background: radial-gradient(circle at 50% 20%, #1e293b 0%, #090d16 55%, #030509 100%);
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            }
+            body.framed-mode #iphone-shell {
+                width: 412px;
+                height: 868px;
+                max-height: 93vh;
+                border-radius: 54px;
+                box-shadow: 
+                    0 0 0 2px #38383A,
+                    0 0 0 11px #141416,
+                    0 0 0 13px #2c2c2e,
+                    0 30px 70px rgba(0, 0, 0, 0.85);
+                position: relative;
+                overflow: hidden;
+                background: #000000;
+            }
+        }
+
+        @media (max-width: 767px) {
+            #iphone-shell {
+                width: 100vw;
+                height: 100dvh;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+            }
+            #desktop-frame-controls,
+            #ios-status-bar,
+            #ios-home-indicator {
+                display: none !important;
+            }
+            .safe-top-pad {
+                padding-top: calc(var(--safe-top) + 12px) !important;
+            }
+            .safe-bottom-pad {
+                padding-bottom: calc(var(--safe-bottom) + 84px) !important;
+            }
+            .tabbar-safe-bottom {
+                padding-bottom: var(--safe-bottom) !important;
+                height: calc(64px + var(--safe-bottom)) !important;
+            }
+        }
+    </style>
+</head>
+<body class="framed-mode font-ios">
+
+    <!-- Barra superior flotante solo visible en escritorio para cambiar entre marco iPhone o pantalla completa -->
+    <div id="desktop-frame-controls" class="hidden md:flex items-center gap-3 mb-3 px-4 py-1.5 rounded-full bg-ios-card/90 border border-ios-sep text-xs text-ios-gray shadow-lg">
+        <span class="flex items-center gap-1.5 text-white font-medium">
+            <i class="ph-fill ph-device-mobile-camera text-ios-green text-sm"></i>
+            Vista iPhone 16 Pro OLED
+        </span>
+        <span class="text-ios-sep">|</span>
+        <button onclick="toggleDesktopFrame()" id="btn-toggle-frame" class="text-ios-blue hover:underline font-medium">
+            Ver en pantalla completa
+        </button>
+    </div>
+
+    <!-- CHASIS PRINCIPAL DEL IPHONE / APP CONTAINER -->
+    <div id="iphone-shell" class="w-full h-dvh bg-black flex flex-col relative overflow-hidden">
+
+        <!-- BARRA DE ESTADO DE IOS + DYNAMIC ISLAND (Visible en el simulador de escritorio) -->
+        <div id="ios-status-bar" class="h-12 px-7 pt-2 flex items-center justify-between text-white text-[13px] font-semibold shrink-0 z-40 select-none bg-black/80 backdrop-blur-md">
+            <span id="status-time" class="tracking-tight w-14">9:41</span>
+            
+            <!-- Dynamic Island interactiva -->
+            <div onclick="pulseDynamicIsland()" id="dynamic-island" class="h-[27px] w-[116px] bg-black border border-white/10 rounded-full flex items-center justify-between px-3 cursor-pointer transition-all duration-300 shadow-inner">
+                <div class="w-2.5 h-2.5 rounded-full bg-ios-green animate-pulse"></div>
+                <span id="island-kcal" class="text-[10px] font-bold text-ios-green tracking-tight">2200 kcal</span>
+            </div>
+
+            <div class="flex items-center gap-1.5 w-14 justify-end text-xs">
+                <i class="ph-fill ph-cell-signal-full"></i>
+                <i class="ph-fill ph-wifi-high"></i>
+                <i class="ph-fill ph-battery-high text-base text-ios-green"></i>
+            </div>
+        </div>
+
+        <!-- AREA DE CONTENIDO SCROLLABLE DE LA APP -->
+        <main id="app-scroll-view" class="flex-1 overflow-y-auto no-scrollbar safe-top-pad safe-bottom-pad pb-24">
+
+            <!-- =================================================================== -->
+            <!-- PESTAÑA 1: HOY (RESUMEN FITNESS RINGS + TARJETAS DE COMIDAS)       -->
+            <!-- =================================================================== -->
+            <section id="tab-hoy" class="px-4 pt-2 space-y-4">
+                
+                <!-- Cabecera iOS Large Title -->
+                <div class="flex items-end justify-between pt-1">
+                    <div>
+                        <p id="current-date-label" class="text-xs font-semibold uppercase tracking-wider text-ios-gray">MARTES, 13 OCT</p>
+                        <h1 class="text-3xl font-bold tracking-tight text-white">Resumen</h1>
+                    </div>
+                    <button onclick="switchTab('objetivos')" class="ios-press flex items-center gap-1.5 bg-ios-card hover:bg-ios-card2 px-3 py-1.5 rounded-full border border-ios-sep/60 text-xs font-semibold text-ios-green">
+                        <i class="ph-fill ph-target text-sm"></i>
+                        <span id="header-goal-pill">2200 kcal</span>
+                    </button>
+                </div>
+
+                <!-- Tarjeta Principal estilo Apple Fitness / Health Activity Rings -->
+                <div class="bg-ios-card rounded-[24px] p-4 shadow-lg border border-white/5">
+                    <div class="flex items-center justify-between gap-4">
+                        
+                        <!-- Triple Anillo Concéntrico SVG -->
+                        <div class="relative w-36 h-36 flex items-center justify-center shrink-0">
+                            <svg class="w-full h-full" viewBox="0 0 140 140">
+                                <!-- Fondo Anillos -->
+                                <circle cx="70" cy="70" r="58" fill="none" stroke="#30D158" stroke-opacity="0.16" stroke-width="11"/>
+                                <circle cx="70" cy="70" r="44" fill="none" stroke="#FF2D55" stroke-opacity="0.16" stroke-width="11"/>
+                                <circle cx="70" cy="70" r="30" fill="none" stroke="#0A84FF" stroke-opacity="0.16" stroke-width="11"/>
+
+                                <!-- Anillo Exterior: Calorías (r=58, C=364.42) -->
+                                <circle id="ring-cal" class="fitness-ring" cx="70" cy="70" r="58" fill="none" stroke="#30D158" stroke-width="11" stroke-linecap="round" stroke-dasharray="364.42" stroke-dashoffset="364.42"/>
+                                <!-- Anillo Medio: Proteínas (r=44, C=276.46) -->
+                                <circle id="ring-pro" class="fitness-ring" cx="70" cy="70" r="44" fill="none" stroke="#FF2D55" stroke-width="11" stroke-linecap="round" stroke-dasharray="276.46" stroke-dashoffset="276.46"/>
+                                <!-- Anillo Interior: Carbohidratos (r=30, C=188.50) -->
+                                <circle id="ring-carb" class="fitness-ring" cx="70" cy="70" r="30" fill="none" stroke="#0A84FF" stroke-width="11" stroke-linecap="round" stroke-dasharray="188.50" stroke-dashoffset="188.50"/>
+                            </svg>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
+                                <span id="ring-center-val" class="text-lg font-extrabold tracking-tight text-white leading-none">2200</span>
+                                <span id="ring-center-lbl" class="text-[10px] font-semibold text-ios-gray uppercase mt-0.5">Restantes</span>
+                            </div>
+                        </div>
+
+                        <!-- Métricas derechas estilo Apple Health -->
+                        <div class="flex-1 space-y-2.5">
+                            <div>
+                                <div class="flex items-center gap-1.5 text-xs font-semibold text-ios-green">
+                                    <i class="ph-fill ph-flame"></i>
+                                    <span>Energía Consumida</span>
+                                </div>
+                                <div class="flex items-baseline gap-1 mt-0.5">
+                                    <span id="stat-cal-consumed" class="text-2xl font-extrabold text-white tracking-tight">0</span>
+                                    <span class="text-xs text-ios-gray font-medium">/ <span id="stat-cal-target">2200</span> kcal</span>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2 pt-1 border-t border-ios-sep/60">
+                                <div>
+                                    <span class="text-[11px] text-ios-gray block">Alimentos hoy</span>
+                                    <span id="stat-total-items" class="text-xs font-bold text-white">0 registros</span>
+                                </div>
+                                <div>
+                                    <span class="text-[11px] text-ios-gray block">Reparto calórico</span>
+                                    <span id="stat-macro-split" class="text-xs font-bold text-ios-teal">0/0/0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tres Mini-Tarjetas de Macronutrientes -->
+                    <div class="grid grid-cols-3 gap-2.5 mt-4 pt-3.5 border-t border-ios-sep/60">
+                        <!-- Proteína -->
+                        <div class="bg-ios-card2/70 rounded-2xl p-2.5">
+                            <div class="flex items-center justify-between text-[11px] font-semibold mb-1">
+                                <span class="text-ios-pink flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-ios-pink"></span>Proteína</span>
+                                <span id="stat-pro-pct" class="text-ios-gray">0%</span>
+                            </div>
+                            <div class="text-base font-extrabold text-white leading-tight">
+                                <span id="stat-pro-consumed">0</span><span class="text-xs font-normal text-ios-gray"> / <span id="stat-pro-target">160</span>g</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-black/50 rounded-full overflow-hidden mt-2">
+                                <div id="bar-pro" class="h-full bg-ios-pink rounded-full transition-all duration-500" style="width:0%"></div>
+                            </div>
+                            <span id="stat-pro-rem" class="text-[10px] text-ios-gray block mt-1">Faltan 160g</span>
+                        </div>
+
+                        <!-- Carbohidratos -->
+                        <div class="bg-ios-card2/70 rounded-2xl p-2.5">
+                            <div class="flex items-center justify-between text-[11px] font-semibold mb-1">
+                                <span class="text-ios-blue flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-ios-blue"></span>Carbos</span>
+                                <span id="stat-carb-pct" class="text-ios-gray">0%</span>
+                            </div>
+                            <div class="text-base font-extrabold text-white leading-tight">
+                                <span id="stat-carb-consumed">0</span><span class="text-xs font-normal text-ios-gray"> / <span id="stat-carb-target">220</span>g</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-black/50 rounded-full overflow-hidden mt-2">
+                                <div id="bar-carb" class="h-full bg-ios-blue rounded-full transition-all duration-500" style="width:0%"></div>
+                            </div>
+                            <span id="stat-carb-rem" class="text-[10px] text-ios-gray block mt-1">Faltan 220g</span>
+                        </div>
+
+                        <!-- Grasas -->
+                        <div class="bg-ios-card2/70 rounded-2xl p-2.5">
+                            <div class="flex items-center justify-between text-[11px] font-semibold mb-1">
+                                <span class="text-ios-orange flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-ios-orange"></span>Grasas</span>
+                                <span id="stat-fat-pct" class="text-ios-gray">0%</span>
+                            </div>
+                            <div class="text-base font-extrabold text-white leading-tight">
+                                <span id="stat-fat-consumed">0</span><span class="text-xs font-normal text-ios-gray"> / <span id="stat-fat-target">75</span>g</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-black/50 rounded-full overflow-hidden mt-2">
+                                <div id="bar-fat" class="h-full bg-ios-orange rounded-full transition-all duration-500" style="width:0%"></div>
+                            </div>
+                            <span id="stat-fat-rem" class="text-[10px] text-ios-gray block mt-1">Faltan 75g</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CENTRO DE INTELIGENCIA ARTIFICIAL GEMINI (ESTILO APPLE INTELLIGENCE) -->
+                <div class="bg-gradient-to-r from-ios-purple/20 via-ios-blue/15 to-ios-green/15 rounded-[22px] p-3.5 border border-white/10 shadow-md space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-ios-purple to-ios-blue flex items-center justify-center text-white shadow">
+                                <i class="ph-fill ph-sparkle text-sm"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xs font-extrabold uppercase tracking-wider text-white">NutriTrack Intelligence</h3>
+                                <p class="text-[10px] text-slate-300">Potenciado por Gemini AI</p>
+                            </div>
+                        </div>
+                        <button onclick="getAICoachFeedback()" id="btn-ai-coach" class="ios-press px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/15 text-[11px] font-semibold text-ios-teal flex items-center gap-1 border border-white/10">
+                            <i class="ph-fill ph-magic-wand"></i> Evaluar mi día
+                        </button>
+                    </div>
+
+                    <!-- Acciones Rápidas de IA -->
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="openSheet('sheet-ai-scanner')" class="ios-press bg-ios-card/90 hover:bg-ios-card2 p-2.5 rounded-2xl border border-white/10 flex items-center gap-2.5 text-left">
+                            <div class="w-9 h-9 rounded-xl bg-ios-purple/20 text-ios-purple flex items-center justify-center shrink-0">
+                                <i class="ph-fill ph-camera-plus text-lg"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="text-xs font-bold text-white block truncate">Escáner IA</span>
+                                <span class="text-[10px] text-ios-gray block truncate">Texto o Foto a Macros</span>
+                            </div>
+                        </button>
+
+                        <button onclick="openAIChefSheet()" class="ios-press bg-ios-card/90 hover:bg-ios-card2 p-2.5 rounded-2xl border border-white/10 flex items-center gap-2.5 text-left">
+                            <div class="w-9 h-9 rounded-xl bg-ios-green/20 text-ios-green flex items-center justify-center shrink-0">
+                                <i class="ph-fill ph-cooking-pot text-lg"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="text-xs font-bold text-white block truncate">Chef Macros IA</span>
+                                <span class="text-[10px] text-ios-gray block truncate">Cuadrar lo que falta</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- Respuesta dinámica del Coach IA con opción de voz TTS -->
+                    <div id="ai-coach-box" class="hidden bg-black/50 rounded-xl p-3 border border-white/10 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-ios-teal flex items-center gap-1">
+                                <i class="ph-fill ph-Waveform"></i> Análisis del Coach Gemini
+                            </span>
+                            <div class="flex items-center gap-1.5">
+                                <button onclick="speakCoachFeedback()" id="btn-tts-coach" class="ios-press px-2 py-0.5 rounded-md bg-ios-blue/20 text-ios-blue text-[10px] font-bold flex items-center gap-1">
+                                    <i class="ph-fill ph-speaker-high"></i> Escuchar
+                                </button>
+                                <button onclick="document.getElementById('ai-coach-box').classList.add('hidden')" class="text-ios-gray hover:text-white text-xs">
+                                    <i class="ph-bold ph-x"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <p id="ai-coach-text" class="text-xs text-slate-200 leading-relaxed"></p>
+                    </div>
+                </div>
+
+                <!-- Encabezado de Sección Comidas del Día -->
+                <div class="flex items-center justify-between px-1 pt-1">
+                    <h2 class="text-lg font-bold tracking-tight text-white">Registro de Comidas</h2>
+                    <div class="flex items-center gap-3">
+                        <button onclick="openSheet('sheet-ai-scanner')" class="ios-press text-xs font-semibold text-ios-purple flex items-center gap-1">
+                            <i class="ph-fill ph-sparkle"></i> IA
+                        </button>
+                        <button onclick="openSheet('sheet-custom-food')" class="ios-press text-xs font-semibold text-ios-blue flex items-center gap-1">
+                            <i class="ph-bold ph-plus-circle"></i> Crear plato
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Contenedor de las 6 comidas diarias (Desayuno, Almuerzo, Comida, Merienda, Cena, Snacks) -->
+                <div id="meals-list-container" class="space-y-3 pb-4"></div>
+            </section>
+
+            <!-- =================================================================== -->
+            <!-- PESTAÑA 2: ALIMENTOS (BUSCADOR IOS + FILTROS + BASE DE DATOS)      -->
+            <!-- =================================================================== -->
+            <section id="tab-alimentos" class="hidden px-4 pt-2 space-y-3.5">
+                <div class="flex items-center justify-between pt-1">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-ios-gray">VALORES POR 100G</p>
+                        <h1 class="text-3xl font-bold tracking-tight text-white">Alimentos</h1>
+                    </div>
+                    <button onclick="openSheet('sheet-custom-food')" class="ios-press bg-ios-green text-black font-bold text-xs px-3.5 py-2 rounded-full flex items-center gap-1 shadow-md">
+                        <i class="ph-bold ph-plus"></i> Nuevo
+                    </button>
+                </div>
+
+                <!-- Selector rápido de destino de comida -->
+                <div class="bg-ios-card rounded-2xl p-3 flex items-center justify-between border border-white/5">
+                    <span class="text-xs text-ios-gray font-medium flex items-center gap-1.5">
+                        <i class="ph-fill ph-fork-knife text-ios-green text-sm"></i>
+                        Añadir directamente en:
+                    </span>
+                    <select id="quick-meal-selector" class="bg-ios-card2 text-white text-xs font-semibold px-3 py-1.5 rounded-xl border border-ios-sep focus:outline-none">
+                        <option value="desayuno">🌅 Desayuno</option>
+                        <option value="almuerzo">🥐 Almuerzo (Media mañana)</option>
+                        <option value="comida" selected>☀️ Comida</option>
+                        <option value="merienda">⚡ Merienda / Entreno</option>
+                        <option value="cena">🌙 Cena</option>
+                        <option value="snacks">🍎 Snacks</option>
+                    </select>
+                </div>
+
+                <!-- Barra de Búsqueda Nativa estilo iOS -->
+                <div class="relative">
+                    <i class="ph ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-ios-gray text-lg"></i>
+                    <input type="text" id="food-search" placeholder="Buscar pollo, arroz, huevo, avena..." 
+                        class="w-full bg-ios-card border border-ios-sep/60 rounded-2xl pl-10 pr-9 py-2.5 text-white placeholder-ios-gray focus:outline-none focus:border-ios-blue transition">
+                    <button id="clear-search" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-ios-gray hover:text-white">
+                        <i class="ph-fill ph-x-circle text-lg"></i>
+                    </button>
+                </div>
+
+                <!-- Píldoras de Categorías -->
+                <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+                    <button onclick="filterCategory('all')" data-cat="all" class="cat-pill px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white text-black whitespace-nowrap transition">Todos</button>
+                    <button onclick="filterCategory('Proteínas')" data-cat="Proteínas" class="cat-pill px-3.5 py-1.5 rounded-full text-xs font-semibold bg-ios-card text-ios-gray whitespace-nowrap transition">🥩 Proteínas</button>
+                    <button onclick="filterCategory('Carbohidratos')" data-cat="Carbohidratos" class="cat-pill px-3.5 py-1.5 rounded-full text-xs font-semibold bg-ios-card text-ios-gray whitespace-nowrap transition">🍚 Carbos</button>
+                    <button onclick="filterCategory('Grasas y Lácteos')" data-cat="Grasas y Lácteos" class="cat-pill px-3.5 py-1.5 rounded-full text-xs font-semibold bg-ios-card text-ios-gray whitespace-nowrap transition">🥑 Grasas/Lácteos</button>
+                    <button onclick="filterCategory('Frutas y Verduras')" data-cat="Frutas y Verduras" class="cat-pill px-3.5 py-1.5 rounded-full text-xs font-semibold bg-ios-card text-ios-gray whitespace-nowrap transition">🍌 Frutas</button>
+                    <button onclick="filterCategory('Personalizado')" data-cat="Personalizado" class="cat-pill px-3.5 py-1.5 rounded-full text-xs font-semibold bg-ios-card text-ios-gray whitespace-nowrap transition">⭐ Mis Platos</button>
+                </div>
+
+                <!-- Lista Agrupada estilo iOS Inset Grouped -->
+                <div id="food-database-list" class="space-y-2 pb-6"></div>
+            </section>
+
+            <!-- =================================================================== -->
+            <!-- PESTAÑA 3: OBJETIVOS (CALCULADORA TDEE + EDICIÓN DE MACROS)        -->
+            <!-- =================================================================== -->
+            <section id="tab-objetivos" class="hidden px-4 pt-2 space-y-4">
+                <div class="pt-1">
+                    <p class="text-xs font-semibold uppercase tracking-wider text-ios-gray">METABOLISMO Y METAS</p>
+                    <h1 class="text-3xl font-bold tracking-tight text-white">Objetivos</h1>
+                </div>
+
+                <!-- Segmented Control estilo iOS -->
+                <div class="bg-ios-card p-1 rounded-xl grid grid-cols-2 gap-1 border border-ios-sep/40">
+                    <button id="seg-btn-calc" onclick="switchGoalMode('calc')" class="py-1.5 rounded-lg text-xs font-semibold bg-ios-card3 text-white shadow transition">
+                        Calculadora TDEE
+                    </button>
+                    <button id="seg-btn-manual" onclick="switchGoalMode('manual')" class="py-1.5 rounded-lg text-xs font-semibold text-ios-gray hover:text-white transition">
+                        Edición Manual
+                    </button>
+                </div>
+
+                <!-- Panel Calculadora TDEE estilo Ajustes de iOS -->
+                <div id="goal-panel-calc" class="space-y-3">
+                    <div class="bg-ios-card rounded-2xl overflow-hidden divide-y divide-ios-sep/50 border border-white/5">
+                        <div class="px-4 py-3 flex items-center justify-between">
+                            <span class="text-sm text-white font-medium">Fórmula</span>
+                            <select id="tdee-formula" class="bg-transparent text-ios-blue text-sm font-semibold text-right focus:outline-none">
+                                <option value="mifflin" class="bg-ios-card text-white">Mifflin-St Jeor</option>
+                                <option value="harris" class="bg-ios-card text-white">Harris-Benedict</option>
+                            </select>
+                        </div>
+                        <div class="px-4 py-3 flex items-center justify-between">
+                            <span class="text-sm text-white font-medium">Sexo Biológico</span>
+                            <select id="tdee-gender" class="bg-transparent text-ios-blue text-sm font-semibold text-right focus:outline-none">
+                                <option value="male" class="bg-ios-card text-white">Hombre</option>
+                                <option value="female" class="bg-ios-card text-white">Mujer</option>
+                            </select>
+                        </div>
+                        <div class="px-4 py-2.5 flex items-center justify-between">
+                            <span class="text-sm text-white font-medium">Edad (años)</span>
+                            <input type="number" id="tdee-age" inputmode="decimal" value="28" class="w-20 bg-ios-card2 rounded-lg px-2.5 py-1 text-right text-white font-bold focus:outline-none focus:ring-1 focus:ring-ios-blue">
+                        </div>
+                        <div class="px-4 py-2.5 flex items-center justify-between">
+                            <span class="text-sm text-white font-medium">Peso Corporal (kg)</span>
+                            <input type="number" id="tdee-weight" inputmode="decimal" step="0.5" value="75" class="w-24 bg-ios-card2 rounded-lg px-2.5 py-1 text-right text-white font-bold focus:outline-none focus:ring-1 focus:ring-ios-blue">
+                        </div>
+                        <div class="px-4 py-2.5 flex items-center justify-between">
+                            <span class="text-sm text-white font-medium">Altura (cm)</span>
+                            <input type="number" id="tdee-height" inputmode="decimal" value="175" class="w-24 bg-ios-card2 rounded-lg px-2.5 py-1 text-right text-white font-bold focus:outline-none focus:ring-1 focus:ring-ios-blue">
+                        </div>
+                        <div class="px-4 py-3 flex items-center justify-between">
+                            <span class="text-sm text-white font-medium">Actividad</span>
+                            <select id="tdee-activity" class="bg-transparent text-ios-blue text-sm font-semibold text-right focus:outline-none max-w-[190px]">
+                                <option value="1.2" class="bg-ios-card text-white">Sedentario (Oficina)</option>
+                                <option value="1.375" class="bg-ios-card text-white">Ligero (1-3 días/sem)</option>
+                                <option value="1.55" selected class="bg-ios-card text-white">Moderado (3-5 días/sem)</option>
+                                <option value="1.725" class="bg-ios-card text-white">Activo (6-7 días/sem)</option>
+                                <option value="1.9" class="bg-ios-card text-white">Muy Activo (Atleta)</option>
+                            </select>
+                        </div>
+                        <div class="px-4 py-3 flex items-center justify-between">
+                            <span class="text-sm text-white font-medium">Objetivo</span>
+                            <select id="tdee-goal" class="bg-transparent text-ios-green text-sm font-semibold text-right focus:outline-none max-w-[190px]">
+                                <option value="-450" class="bg-ios-card text-white">🔥 Definición (-450 kcal)</option>
+                                <option value="-250" class="bg-ios-card text-white">📉 Déficit ligero (-250 kcal)</option>
+                                <option value="0" selected class="bg-ios-card text-white">⚖️ Mantenimiento (0 kcal)</option>
+                                <option value="300" class="bg-ios-card text-white">💪 Volumen limpio (+300 kcal)</option>
+                                <option value="500" class="bg-ios-card text-white">🚀 Volumen (+500 kcal)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button onclick="calculateTDEE()" class="ios-press w-full py-3 rounded-2xl bg-ios-blue text-white font-bold text-sm shadow-lg shadow-ios-blue/25 flex items-center justify-center gap-2">
+                        <i class="ph-bold ph-magic-wand"></i>
+                        <span>Calcular Mis Macros Recomendados</span>
+                    </button>
+                </div>
+
+                <!-- Tarjeta de Metas Diarias Activas (Siempre visible y editable) -->
+                <div class="bg-ios-card rounded-2xl p-4 border border-white/5 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-bold text-white uppercase tracking-wider">Metas Diarias Activas</h3>
+                        <span class="text-[11px] text-ios-gray">4 kcal/g P y C • 9 kcal/g G</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div class="bg-ios-card2 p-3 rounded-xl">
+                            <label class="text-[11px] font-semibold text-ios-green block">Calorías (kcal)</label>
+                            <input type="number" id="target-input-cal" inputmode="numeric" value="2200" class="w-full bg-transparent text-xl font-extrabold text-white focus:outline-none mt-0.5">
+                        </div>
+                        <div class="bg-ios-card2 p-3 rounded-xl">
+                            <label class="text-[11px] font-semibold text-ios-pink block">Proteínas (g)</label>
+                            <input type="number" id="target-input-pro" inputmode="numeric" oninput="syncCaloriesFromMacros()" value="160" class="w-full bg-transparent text-xl font-extrabold text-white focus:outline-none mt-0.5">
+                        </div>
+                        <div class="bg-ios-card2 p-3 rounded-xl">
+                            <label class="text-[11px] font-semibold text-ios-blue block">Carbohidratos (g)</label>
+                            <input type="number" id="target-input-carb" inputmode="numeric" oninput="syncCaloriesFromMacros()" value="220" class="w-full bg-transparent text-xl font-extrabold text-white focus:outline-none mt-0.5">
+                        </div>
+                        <div class="bg-ios-card2 p-3 rounded-xl">
+                            <label class="text-[11px] font-semibold text-ios-orange block">Grasas (g)</label>
+                            <input type="number" id="target-input-fat" inputmode="numeric" oninput="syncCaloriesFromMacros()" value="75" class="w-full bg-transparent text-xl font-extrabold text-white focus:outline-none mt-0.5">
+                        </div>
+                    </div>
+
+                    <button onclick="saveTargets()" class="ios-press w-full py-3 rounded-2xl bg-ios-green text-black font-bold text-sm flex items-center justify-center gap-1.5 shadow-lg shadow-ios-green/20">
+                        <i class="ph-bold ph-check-circle text-base"></i>
+                        <span>Guardar Objetivos en Mi iPhone</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- =================================================================== -->
+            <!-- PESTAÑA 4: DATOS (EXPORTAR, WHATSAPP, SAFARI PWA Y REINICIO)        -->
+            <!-- =================================================================== -->
+            <section id="tab-datos" class="hidden px-4 pt-2 space-y-4 pb-6">
+                <div class="pt-1">
+                    <p class="text-xs font-semibold uppercase tracking-wider text-ios-gray">EXPORTACIÓN Y SISTEMA</p>
+                    <h1 class="text-3xl font-bold tracking-tight text-white">Datos</h1>
+                </div>
+
+                <!-- Tarjeta Instalar en Pantalla de Inicio de iPhone -->
+                <div class="bg-gradient-to-br from-ios-card to-ios-card2 rounded-2xl p-4 border border-ios-sep/60 space-y-2.5">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-10 h-10 rounded-xl bg-ios-blue/20 text-ios-blue flex items-center justify-center shrink-0">
+                            <i class="ph-fill ph-export text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-white">Instalar como App Nativa en iPhone</h3>
+                            <p class="text-xs text-ios-gray">Úsala a pantalla completa sin barras de Safari</p>
+                        </div>
+                    </div>
+                    <ol class="text-xs text-slate-300 space-y-1.5 pl-4 list-decimal">
+                        <li>Abre esta página desde <strong>Safari</strong> en tu iPhone.</li>
+                        <li>Pulsa el botón <strong>Compartir</strong> <i class="ph ph-export text-ios-blue"></i> en la barra inferior.</li>
+                        <li>Selecciona <strong>"Añadir a pantalla de inicio"</strong> <i class="ph ph-plus-square text-white"></i>.</li>
+                    </ol>
+                </div>
+
+                <!-- Asistente para Compilar .IPA Nativo desde Windows (GitHub Actions + Sideloadly) -->
+                <div class="bg-ios-card rounded-2xl p-4 border border-ios-green/30 space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
+                            <i class="ph-fill ph-apple-logo text-ios-green"></i>
+                            Compilar App .IPA desde Windows
+                        </h3>
+                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-ios-green/15 text-ios-green">Sin tener Mac</span>
+                    </div>
+                    <p class="text-xs text-ios-gray leading-relaxed">
+                        Como Apple exige macOS para crear archivos <code>.ipa</code>, copia este script de <strong>GitHub Actions</strong> para que los servidores Mac gratuitos de GitHub compilen tu app en la nube y puedas instalarla desde Windows con <strong>Sideloadly</strong>.
+                    </p>
+                    <button onclick="copyGitHubActionWorkflow()" class="ios-press w-full py-2.5 px-3 rounded-xl bg-ios-card2 hover:bg-ios-card3 text-ios-green font-bold text-xs flex items-center justify-center gap-1.5 border border-ios-green/30">
+                        <i class="ph-bold ph-code"></i> Copiar Script (.github/workflows/ios.yml)
+                    </button>
+                </div>
+
+                <!-- Resumen Diario para Copiar / Compartir -->
+                <div class="bg-ios-card rounded-2xl p-4 border border-white/5 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
+                            <i class="ph-fill ph-clipboard-text text-ios-green"></i>
+                            Informe Diario de Nutrición
+                        </h3>
+                        <button onclick="generateExportReport()" class="text-xs text-ios-blue font-semibold">Actualizar</button>
+                    </div>
+
+                    <textarea id="export-textarea" readonly rows="8" class="w-full bg-black/60 border border-ios-sep/60 rounded-xl p-3 text-xs font-mono text-slate-200 focus:outline-none"></textarea>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="copyExportText()" class="ios-press py-2.5 px-3 rounded-xl bg-ios-green text-black font-bold text-xs flex items-center justify-center gap-1.5">
+                            <i class="ph-bold ph-copy"></i> Copiar Resumen
+                        </button>
+                        <button onclick="shareNativeiOS()" class="ios-press py-2.5 px-3 rounded-xl bg-ios-card2 text-white font-semibold text-xs flex items-center justify-center gap-1.5 border border-ios-sep">
+                            <i class="ph-bold ph-share-network text-ios-blue"></i> Compartir iOS
+                        </button>
+                    </div>
+                    <button onclick="downloadExportFile()" class="ios-press w-full py-2.5 rounded-xl bg-ios-card2 text-slate-200 font-semibold text-xs flex items-center justify-center gap-1.5">
+                        <i class="ph ph-download-simple"></i> Descargar archivo .TXT
+                    </button>
+                </div>
+
+                <!-- Copia de Seguridad Completa (.JSON) para blindar tus datos -->
+                <div class="bg-ios-card rounded-2xl p-4 border border-ios-blue/30 space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
+                            <i class="ph-fill ph-database text-ios-blue"></i>
+                            Copia de Seguridad Total (.JSON)
+                        </h3>
+                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-ios-blue/15 text-ios-blue">Offline Seguro</span>
+                    </div>
+                    <p class="text-xs text-ios-gray leading-relaxed">
+                        Guarda todos tus objetivos, comidas y platos creados en un archivo físico dentro de la app <strong>Archivos</strong> de tu iPhone o restaura una copia anterior en cualquier momento.
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 pt-1">
+                        <button onclick="exportFullBackupJSON()" class="ios-press py-2.5 px-3 rounded-xl bg-ios-blue text-white font-bold text-xs flex items-center justify-center gap-1.5">
+                            <i class="ph-bold ph-download"></i> Guardar Backup
+                        </button>
+                        <label class="ios-press py-2.5 px-3 rounded-xl bg-ios-card2 text-white font-semibold text-xs flex items-center justify-center gap-1.5 border border-ios-sep cursor-pointer">
+                            <i class="ph-bold ph-upload text-ios-green"></i> Restaurar JSON
+                            <input type="file" accept=".json,application/json" class="hidden" onchange="importFullBackupJSON(event)">
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Configuración Opcional de API Key para uso en iPhone standalone -->
+                <div class="bg-ios-card rounded-2xl p-4 border border-ios-purple/30 space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
+                            <i class="ph-fill ph-key text-ios-purple"></i>
+                            Clave API de Gemini (Para tu iPhone)
+                        </h3>
+                        <span id="api-key-status" class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-ios-green/15 text-ios-green">Lista en Canvas</span>
+                    </div>
+                    <p class="text-xs text-ios-gray leading-relaxed">
+                        Aquí en la vista previa la IA funciona automáticamente. Si instalas la Web App en tu <strong>iPhone 15 Pro Max</strong>, pega tu API Key gratuita de <em>Google AI Studio</em> para usar el Escáner y el Chef IA desde cualquier lugar.
+                    </p>
+                    <div class="flex gap-2">
+                        <input type="password" id="user-gemini-key" placeholder="AIzaSy..." 
+                            class="flex-1 bg-ios-card2 border border-ios-sep rounded-xl px-3 py-2 text-xs text-white placeholder-ios-gray focus:outline-none focus:border-ios-purple">
+                        <button onclick="saveUserApiKey()" class="ios-press px-3.5 py-2 rounded-xl bg-ios-purple text-white font-bold text-xs">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Zona de Reinicio del Día -->
+                <div class="bg-ios-card rounded-2xl p-4 border border-ios-red/25 space-y-2.5">
+                    <h3 class="text-sm font-bold text-ios-red flex items-center gap-1.5">
+                        <i class="ph-fill ph-arrow-counter-clockwise"></i>
+                        Empezar Nuevo Día
+                    </h3>
+                    <p class="text-xs text-ios-gray">Vacía las comidas registradas hoy manteniendo intactos tus objetivos calóricos y tus platos personalizados.</p>
+                    <button onclick="openSheet('sheet-reset')" class="ios-press w-full py-2.5 rounded-xl bg-ios-red/15 text-ios-red border border-ios-red/30 font-bold text-xs">
+                        Reiniciar Comidas del Día
+                    </button>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- =================================================================== -->
+        <!-- BARRA DE NAVEGACIÓN INFERIOR NATIVA (IOS TAB BAR CON BLUR)         -->
+        <!-- =================================================================== -->
+        <nav class="ios-nav-blur border-t border-ios-sep/50 h-16 px-2 flex items-center justify-around shrink-0 z-30 tabbar-safe-bottom">
+            <button onclick="switchTab('hoy')" id="tab-btn-hoy" class="flex flex-col items-center justify-center flex-1 py-1 text-ios-green transition">
+                <i class="ph-fill ph-chart-donut text-2xl"></i>
+                <span class="text-[10px] font-semibold mt-0.5">Hoy</span>
+            </button>
+            <button onclick="switchTab('alimentos')" id="tab-btn-alimentos" class="flex flex-col items-center justify-center flex-1 py-1 text-ios-gray transition">
+                <i class="ph-fill ph-bowl-food text-2xl"></i>
+                <span class="text-[10px] font-semibold mt-0.5">Alimentos</span>
+            </button>
+            <button onclick="switchTab('objetivos')" id="tab-btn-objetivos" class="flex flex-col items-center justify-center flex-1 py-1 text-ios-gray transition">
+                <i class="ph-fill ph-sliders-horizontal text-2xl"></i>
+                <span class="text-[10px] font-semibold mt-0.5">Objetivos</span>
+            </button>
+            <button onclick="switchTab('datos')" id="tab-btn-datos" class="flex flex-col items-center justify-center flex-1 py-1 text-ios-gray transition">
+                <i class="ph-fill ph-cloud-arrow-up text-2xl"></i>
+                <span class="text-[10px] font-semibold mt-0.5">Datos</span>
+            </button>
+        </nav>
+
+        <!-- Indicador Home de iPhone (Solo en vista simulador escritorio) -->
+        <div id="ios-home-indicator" class="h-5 bg-black/90 flex items-center justify-center shrink-0 z-30">
+            <div class="w-32 h-1 bg-white/40 rounded-full"></div>
+        </div>
+
+        <!-- =================================================================== -->
+        <!-- BOTTOM SHEET 1: AÑADIR ALIMENTO Y GRAMOS (MODAL DESLIZABLE IOS)    -->
+        <!-- =================================================================== -->
+        <div id="sheet-add-food" class="fixed md:absolute inset-0 z-50 pointer-events-none flex flex-col justify-end">
+            <div onclick="closeSheet('sheet-add-food')" class="sheet-backdrop absolute inset-0 bg-black/70 opacity-0"></div>
+            <div class="sheet-content relative bg-ios-card rounded-t-[28px] p-5 border-t border-white/10 translate-y-full max-h-[88%] overflow-y-auto">
+                <!-- Drag Handle -->
+                <div class="w-10 h-1.5 bg-ios-gray/40 rounded-full mx-auto mb-3"></div>
+
+                <div class="flex items-start justify-between mb-3">
+                    <div>
+                        <span id="sheet-food-cat" class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-ios-green/15 text-ios-green">Proteínas</span>
+                        <h3 id="sheet-food-title" class="text-lg font-bold text-white mt-1">Pechuga de Pollo</h3>
+                        <p id="sheet-food-base" class="text-xs text-ios-gray">Por 100g: 165 kcal</p>
+                    </div>
+                    <button onclick="closeSheet('sheet-add-food')" class="w-8 h-8 rounded-full bg-ios-card2 text-ios-gray hover:text-white flex items-center justify-center">
+                        <i class="ph-bold ph-x"></i>
+                    </button>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Selección de Comida -->
+                    <div class="bg-ios-card2 rounded-2xl px-3.5 py-2.5 flex items-center justify-between">
+                        <span class="text-xs font-medium text-ios-gray">Comida del día</span>
+                        <select id="sheet-food-meal" class="bg-transparent text-ios-blue font-bold text-sm text-right focus:outline-none">
+                            <option value="desayuno" class="bg-ios-card text-white">🌅 Desayuno</option>
+                            <option value="almuerzo" class="bg-ios-card text-white">🥐 Almuerzo</option>
+                            <option value="comida" class="bg-ios-card text-white">☀️ Comida</option>
+                            <option value="merienda" class="bg-ios-card text-white">⚡ Merienda</option>
+                            <option value="cena" class="bg-ios-card text-white">🌙 Cena</option>
+                            <option value="snacks" class="bg-ios-card text-white">🍎 Snacks</option>
+                        </select>
+                    </div>
+
+                    <!-- Input de Gramos con teclado decimal de iOS -->
+                    <div>
+                        <label class="block text-xs font-medium text-ios-gray mb-1.5">Cantidad en gramos (g) o ml</label>
+                        <div class="relative">
+                            <input type="number" id="sheet-food-grams" inputmode="decimal" value="100" min="1" max="5000"
+                                oninput="updateSheetPreview()"
+                                class="w-full bg-ios-card2 border border-ios-sep rounded-2xl px-4 py-3 text-xl font-extrabold text-white focus:outline-none focus:border-ios-green">
+                            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-ios-gray uppercase">gramos</span>
+                        </div>
+
+                        <!-- Píldoras de gramos rápidos -->
+                        <div class="grid grid-cols-6 gap-1.5 mt-2">
+                            <button type="button" onclick="setQuickGrams(30)" class="ios-press py-1.5 rounded-xl bg-ios-card2 text-xs font-bold text-slate-200 border border-ios-sep/50">30g</button>
+                            <button type="button" onclick="setQuickGrams(50)" class="ios-press py-1.5 rounded-xl bg-ios-card2 text-xs font-bold text-slate-200 border border-ios-sep/50">50g</button>
+                            <button type="button" onclick="setQuickGrams(100)" class="ios-press py-1.5 rounded-xl bg-ios-card2 text-xs font-bold text-slate-200 border border-ios-sep/50">100g</button>
+                            <button type="button" onclick="setQuickGrams(150)" class="ios-press py-1.5 rounded-xl bg-ios-card2 text-xs font-bold text-slate-200 border border-ios-sep/50">150g</button>
+                            <button type="button" onclick="setQuickGrams(200)" class="ios-press py-1.5 rounded-xl bg-ios-card2 text-xs font-bold text-slate-200 border border-ios-sep/50">200g</button>
+                            <button type="button" onclick="setQuickGrams(250)" class="ios-press py-1.5 rounded-xl bg-ios-card2 text-xs font-bold text-slate-200 border border-ios-sep/50">250g</button>
+                        </div>
+                    </div>
+
+                    <!-- Previsualización de Macros de la Porción -->
+                    <div class="grid grid-cols-4 gap-2 text-center bg-black/50 p-3 rounded-2xl border border-ios-sep/40">
+                        <div>
+                            <span id="preview-cal" class="block text-base font-extrabold text-ios-green">165</span>
+                            <span class="text-[10px] text-ios-gray font-semibold">kcal</span>
+                        </div>
+                        <div>
+                            <span id="preview-pro" class="block text-base font-bold text-ios-pink">31g</span>
+                            <span class="text-[10px] text-ios-gray font-semibold">Proteína</span>
+                        </div>
+                        <div>
+                            <span id="preview-carb" class="block text-base font-bold text-ios-blue">0g</span>
+                            <span class="text-[10px] text-ios-gray font-semibold">Carbos</span>
+                        </div>
+                        <div>
+                            <span id="preview-fat" class="block text-base font-bold text-ios-orange">3.6g</span>
+                            <span class="text-[10px] text-ios-gray font-semibold">Grasas</span>
+                        </div>
+                    </div>
+
+                    <button onclick="confirmAddFoodToMeal()" class="ios-press w-full py-3.5 rounded-2xl bg-ios-green text-black font-extrabold text-sm shadow-lg shadow-ios-green/25 flex items-center justify-center gap-1.5">
+                        <i class="ph-bold ph-plus-circle text-lg"></i>
+                        <span>Añadir a mi Registro</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- =================================================================== -->
+        <!-- BOTTOM SHEET 2: CREAR ALIMENTO PERSONALIZADO                       -->
+        <!-- =================================================================== -->
+        <div id="sheet-custom-food" class="fixed md:absolute inset-0 z-50 pointer-events-none flex flex-col justify-end">
+            <div onclick="closeSheet('sheet-custom-food')" class="sheet-backdrop absolute inset-0 bg-black/70 opacity-0"></div>
+            <div class="sheet-content relative bg-ios-card rounded-t-[28px] p-5 border-t border-white/10 translate-y-full max-h-[90%] overflow-y-auto">
+                <div class="w-10 h-1.5 bg-ios-gray/40 rounded-full mx-auto mb-3"></div>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-base font-bold text-white">Nuevo Alimento / Plato (por 100g)</h3>
+                    <button onclick="closeSheet('sheet-custom-food')" class="w-8 h-8 rounded-full bg-ios-card2 text-ios-gray flex items-center justify-center">
+                        <i class="ph-bold ph-x"></i>
+                    </button>
+                </div>
+
+                <form onsubmit="saveCustomFood(event)" class="space-y-3">
+                    <input type="text" id="custom-name" required placeholder="Nombre (ej. Tortilla de avena, Gazpacho...)"
+                        class="w-full bg-ios-card2 border border-ios-sep rounded-2xl px-4 py-3 text-white placeholder-ios-gray focus:outline-none focus:border-ios-green">
+
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div class="bg-ios-card2 p-3 rounded-2xl">
+                            <label class="text-[11px] font-semibold text-ios-pink block">Proteínas (g)</label>
+                            <input type="number" id="custom-pro" inputmode="decimal" step="0.1" value="15" required oninput="autoCalcCustomCalories()"
+                                class="w-full bg-transparent text-lg font-bold text-white focus:outline-none">
+                        </div>
+                        <div class="bg-ios-card2 p-3 rounded-2xl">
+                            <label class="text-[11px] font-semibold text-ios-blue block">Carbohidratos (g)</label>
+                            <input type="number" id="custom-carb" inputmode="decimal" step="0.1" value="25" required oninput="autoCalcCustomCalories()"
+                                class="w-full bg-transparent text-lg font-bold text-white focus:outline-none">
+                        </div>
+                        <div class="bg-ios-card2 p-3 rounded-2xl">
+                            <label class="text-[11px] font-semibold text-ios-orange block">Grasas (g)</label>
+                            <input type="number" id="custom-fat" inputmode="decimal" step="0.1" value="8" required oninput="autoCalcCustomCalories()"
+                                class="w-full bg-transparent text-lg font-bold text-white focus:outline-none">
+                        </div>
+                        <div class="bg-ios-card2 p-3 rounded-2xl">
+                            <label class="text-[11px] font-semibold text-ios-green block">Calorías (kcal)</label>
+                            <input type="number" id="custom-cal" inputmode="numeric" value="232" required
+                                class="w-full bg-transparent text-lg font-extrabold text-white focus:outline-none">
+                        </div>
+                    </div>
+
+                    <label class="flex items-center gap-2.5 px-1 py-1 text-xs text-slate-300">
+                        <input type="checkbox" id="custom-add-now" checked class="w-4 h-4 accent-emerald-500 rounded">
+                        <span>Añadir 100g ahora a la comida activa</span>
+                    </label>
+
+                    <button type="submit" class="ios-press w-full py-3.5 rounded-2xl bg-ios-green text-black font-extrabold text-sm">
+                        Guardar Plato Personalizado
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- =================================================================== -->
+        <!-- BOTTOM SHEET 3: CONFIRMACIÓN DE REINICIO (ESTILO IOS ACTION SHEET) -->
+        <!-- =================================================================== -->
+        <div id="sheet-reset" class="fixed md:absolute inset-0 z-50 pointer-events-none flex flex-col justify-end">
+            <div onclick="closeSheet('sheet-reset')" class="sheet-backdrop absolute inset-0 bg-black/70 opacity-0"></div>
+            <div class="sheet-content relative p-4 space-y-2 translate-y-full">
+                <div class="bg-ios-card/95 backdrop-blur-xl rounded-2xl overflow-hidden text-center divide-y divide-ios-sep/60">
+                    <div class="p-4">
+                        <p class="text-xs font-semibold text-ios-gray">¿Estás seguro de que quieres borrar el registro de comidas de hoy?</p>
+                    </div>
+                    <button onclick="confirmResetDay()" class="w-full py-3.5 text-base font-bold text-ios-red active:bg-ios-card2">
+                        Vaciar Comidas de Hoy
+                    </button>
+                </div>
+                <button onclick="closeSheet('sheet-reset')" class="w-full py-3.5 rounded-2xl bg-ios-card text-base font-bold text-ios-blue active:bg-ios-card2">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+
+        <!-- =================================================================== -->
+        <!-- BOTTOM SHEET 4: ESCÁNER DE COMIDAS CON GEMINI IA (TEXTO + FOTO)    -->
+        <!-- =================================================================== -->
+        <div id="sheet-ai-scanner" class="fixed md:absolute inset-0 z-50 pointer-events-none flex flex-col justify-end">
+            <div onclick="closeSheet('sheet-ai-scanner')" class="sheet-backdrop absolute inset-0 bg-black/75 opacity-0"></div>
+            <div class="sheet-content relative bg-ios-card rounded-t-[28px] p-5 border-t border-white/10 translate-y-full max-h-[92%] overflow-y-auto no-scrollbar">
+                <div class="w-10 h-1.5 bg-ios-gray/40 rounded-full mx-auto mb-3"></div>
+
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-xl bg-ios-purple/20 text-ios-purple flex items-center justify-center">
+                            <i class="ph-fill ph-sparkle text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-white leading-tight">Escáner Nutricional IA</h3>
+                            <p class="text-[11px] text-ios-gray">Describe tu comida o sube una foto de tu plato</p>
+                        </div>
+                    </div>
+                    <button onclick="closeSheet('sheet-ai-scanner')" class="w-8 h-8 rounded-full bg-ios-card2 text-ios-gray flex items-center justify-center">
+                        <i class="ph-bold ph-x"></i>
+                    </button>
+                </div>
+
+                <div class="space-y-3">
+                    <!-- Selector de comida de destino -->
+                    <div class="bg-ios-card2 rounded-2xl px-3.5 py-2.5 flex items-center justify-between">
+                        <span class="text-xs font-medium text-ios-gray">Registrar en:</span>
+                        <select id="ai-scan-meal" class="bg-transparent text-ios-purple font-bold text-sm text-right focus:outline-none">
+                            <option value="desayuno" class="bg-ios-card text-white">🌅 Desayuno</option>
+                            <option value="almuerzo" class="bg-ios-card text-white">🥐 Almuerzo</option>
+                            <option value="comida" selected class="bg-ios-card text-white">☀️ Comida</option>
+                            <option value="merienda" class="bg-ios-card text-white">⚡ Merienda</option>
+                            <option value="cena" class="bg-ios-card text-white">🌙 Cena</option>
+                            <option value="snacks" class="bg-ios-card text-white">🍎 Snacks</option>
+                        </select>
+                    </div>
+
+                    <!-- Descripción en lenguaje natural -->
+                    <div>
+                        <textarea id="ai-scan-prompt" rows="3" placeholder="Ej: He desayunado una tostada de pan integral de 70g con medio aguacate, 2 huevos revueltos y un café con leche..."
+                            class="w-full bg-ios-card2 border border-ios-sep rounded-2xl p-3 text-sm text-white placeholder-ios-gray focus:outline-none focus:border-ios-purple"></textarea>
+                    </div>
+
+                    <!-- Captura o subida de foto desde el iPhone -->
+                    <div class="flex items-center gap-2">
+                        <label class="ios-press flex-1 py-2.5 px-3 rounded-xl bg-ios-card2 border border-ios-sep/80 text-xs font-semibold text-slate-200 flex items-center justify-center gap-2 cursor-pointer">
+                            <i class="ph-fill ph-camera text-ios-purple text-base"></i>
+                            <span id="ai-photo-label">Hacer foto / Elegir imagen</span>
+                            <input type="file" id="ai-scan-image" accept="image/*" class="hidden" onchange="handleAIImageUpload(event)">
+                        </label>
+                        <button id="btn-clear-ai-img" onclick="clearAIImage()" class="hidden ios-press p-2.5 rounded-xl bg-ios-red/20 text-ios-red">
+                            <i class="ph-bold ph-trash"></i>
+                        </button>
+                    </div>
+
+                    <!-- Mini vista previa de la foto -->
+                    <div id="ai-image-preview-wrap" class="hidden relative rounded-2xl overflow-hidden border border-white/10 max-h-36 bg-black flex items-center justify-center">
+                        <img id="ai-image-preview" src="" alt="Vista previa" class="max-h-36 object-contain">
+                    </div>
+
+                    <!-- Botón Analizar con Gemini -->
+                    <button onclick="analyzeMealWithGemini()" id="btn-run-ai-scan" class="ios-press w-full py-3.5 rounded-2xl bg-gradient-to-r from-ios-purple to-ios-blue text-white font-extrabold text-sm shadow-lg flex items-center justify-center gap-2">
+                        <i class="ph-bold ph-magic-wand text-base"></i>
+                        <span>Calcular Macros con Gemini IA</span>
+                    </button>
+
+                    <!-- Resultados estructurados detectados por Gemini -->
+                    <div id="ai-scan-results" class="hidden space-y-2.5 pt-2 border-t border-ios-sep/60">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-white">Alimentos detectados por IA:</span>
+                            <span id="ai-scan-total-badge" class="text-xs font-extrabold text-ios-green">0 kcal</span>
+                        </div>
+                        <div id="ai-scan-items-list" class="space-y-1.5 max-h-48 overflow-y-auto no-scrollbar"></div>
+
+                        <button onclick="confirmAddAIScannedItems()" class="ios-press w-full py-3 rounded-2xl bg-ios-green text-black font-extrabold text-sm flex items-center justify-center gap-1.5">
+                            <i class="ph-bold ph-check-circle text-lg"></i>
+                            <span>Añadir Todo a la Comida</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- =================================================================== -->
+        <!-- BOTTOM SHEET 5: CHEF INTELIGENTE IA (CUADRAR MACROS RESTANTES)     -->
+        <!-- =================================================================== -->
+        <div id="sheet-ai-chef" class="fixed md:absolute inset-0 z-50 pointer-events-none flex flex-col justify-end">
+            <div onclick="closeSheet('sheet-ai-chef')" class="sheet-backdrop absolute inset-0 bg-black/75 opacity-0"></div>
+            <div class="sheet-content relative bg-ios-card rounded-t-[28px] p-5 border-t border-white/10 translate-y-full max-h-[92%] overflow-y-auto no-scrollbar">
+                <div class="w-10 h-1.5 bg-ios-gray/40 rounded-full mx-auto mb-3"></div>
+
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-xl bg-ios-green/20 text-ios-green flex items-center justify-center">
+                            <i class="ph-fill ph-cooking-pot text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-white leading-tight">Chef IA: Cuadrar Macros</h3>
+                            <p id="chef-remaining-subtitle" class="text-[11px] text-ios-gray">Calculando tus macros restantes...</p>
+                        </div>
+                    </div>
+                    <button onclick="closeSheet('sheet-ai-chef')" class="w-8 h-8 rounded-full bg-ios-card2 text-ios-gray flex items-center justify-center">
+                        <i class="ph-bold ph-x"></i>
+                    </button>
+                </div>
+
+                <div class="space-y-3">
+                    <input type="text" id="ai-chef-prefs" placeholder="Opcional: Con pollo y arroz, rápido en Airfryer, vegetariano, dulce..."
+                        class="w-full bg-ios-card2 border border-ios-sep rounded-2xl px-3.5 py-2.5 text-xs text-white placeholder-ios-gray focus:outline-none focus:border-ios-green">
+
+                    <button onclick="generateChefSuggestions()" id="btn-run-ai-chef" class="ios-press w-full py-3 rounded-2xl bg-ios-green text-black font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-md">
+                        <i class="ph-fill ph-sparkle text-sm"></i>
+                        <span>Sugerir 3 Platos Exactos con IA</span>
+                    </button>
+
+                    <!-- Contenedor de tarjetas de recetas sugeridas -->
+                    <div id="ai-chef-results" class="space-y-2.5 pt-1 max-h-80 overflow-y-auto no-scrollbar"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NOTIFICACIÓN FLOTANTE TIPO DYNAMIC ISLAND / TOAST IOS -->
+        <div id="ios-toast" class="pointer-events-none fixed md:absolute top-14 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 opacity-0 -translate-y-3">
+            <div class="bg-ios-card2/95 backdrop-blur-xl border border-white/15 px-4 py-2 rounded-full shadow-2xl flex items-center gap-2 text-xs font-semibold text-white whitespace-nowrap">
+                <i id="ios-toast-icon" class="ph-fill ph-check-circle text-ios-green text-base"></i>
+                <span id="ios-toast-text">Guardado</span>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Base de datos con +32 alimentos habituales en España e Hispanoamérica (por 100g)
+        const DEFAULT_FOODS = [
+            { id: 'f1', name: 'Pechuga de Pollo (cruda)', category: 'Proteínas', cal: 165, pro: 31, carb: 0, fat: 3.6 },
+            { id: 'f2', name: 'Huevo Entero (1 ud ≈ 60g)', category: 'Proteínas', cal: 155, pro: 13, carb: 1.1, fat: 11 },
+            { id: 'f3', name: 'Claras de Huevo', category: 'Proteínas', cal: 52, pro: 11, carb: 0.7, fat: 0.2 },
+            { id: 'f4', name: 'Proteína Whey Isolate', category: 'Proteínas', cal: 385, pro: 80, carb: 5, fat: 4.5 },
+            { id: 'f5', name: 'Salmón Fresco', category: 'Proteínas', cal: 208, pro: 20, carb: 0, fat: 13 },
+            { id: 'f6', name: 'Ternera Magra', category: 'Proteínas', cal: 215, pro: 26, carb: 0, fat: 12 },
+            { id: 'f7', name: 'Atún al Natural (escurrido)', category: 'Proteínas', cal: 116, pro: 26, carb: 0, fat: 1 },
+            { id: 'f8', name: 'Pechuga de Pavo en lonchas', category: 'Proteínas', cal: 108, pro: 23, carb: 1.5, fat: 1.2 },
+            { id: 'f9', name: 'Merluza / Pescado Blanco', category: 'Proteínas', cal: 89, pro: 18, carb: 0, fat: 1.8 },
+            { id: 'f10', name: 'Jamón Serrano / Ibérico Magro', category: 'Proteínas', cal: 241, pro: 31, carb: 0.5, fat: 13 },
+            { id: 'f11', name: 'Lomo Embuchado', category: 'Proteínas', cal: 205, pro: 38, carb: 1, fat: 5.5 },
+            { id: 'f12', name: 'Avena en Copos', category: 'Carbohidratos', cal: 389, pro: 16.9, carb: 66.3, fat: 6.9 },
+            { id: 'f13', name: 'Arroz Blanco (en crudo)', category: 'Carbohidratos', cal: 365, pro: 7.1, carb: 80, fat: 0.7 },
+            { id: 'f14', name: 'Arroz Blanco (cocido)', category: 'Carbohidratos', cal: 130, pro: 2.7, carb: 28, fat: 0.3 },
+            { id: 'f15', name: 'Pasta Integral / Trigo (cruda)', category: 'Carbohidratos', cal: 355, pro: 12.5, carb: 71, fat: 1.8 },
+            { id: 'f16', name: 'Patata (cocida / Airfryer)', category: 'Carbohidratos', cal: 87, pro: 1.9, carb: 20.1, fat: 0.1 },
+            { id: 'f17', name: 'Boniato / Batata asada', category: 'Carbohidratos', cal: 86, pro: 1.6, carb: 20.1, fat: 0.1 },
+            { id: 'f18', name: 'Pan 100% Integral / Centeno', category: 'Carbohidratos', cal: 247, pro: 13, carb: 41, fat: 3.4 },
+            { id: 'f19', name: 'Lentejas / Garbanzos Cocidos', category: 'Carbohidratos', cal: 116, pro: 9, carb: 20, fat: 0.4 },
+            { id: 'f20', name: 'Tortitas de Arroz o Maíz', category: 'Carbohidratos', cal: 387, pro: 8, carb: 81, fat: 2.8 },
+            { id: 'f21', name: 'Crema de Arroz (Pre-entreno)', category: 'Carbohidratos', cal: 360, pro: 7.5, carb: 80, fat: 1 },
+            { id: 'f22', name: 'Aceite de Oliva Virgen Extra', category: 'Grasas y Lácteos', cal: 884, pro: 0, carb: 0, fat: 100 },
+            { id: 'f23', name: 'Aguacate Hass', category: 'Grasas y Lácteos', cal: 160, pro: 2, carb: 8.5, fat: 14.7 },
+            { id: 'f24', name: 'Almendras / Nueces Naturales', category: 'Grasas y Lácteos', cal: 579, pro: 21, carb: 21.5, fat: 49.9 },
+            { id: 'f25', name: 'Crema de Cacahuete 100%', category: 'Grasas y Lácteos', cal: 588, pro: 25, carb: 20, fat: 50 },
+            { id: 'f26', name: 'Queso Fresco Batido 0% / Skyr', category: 'Grasas y Lácteos', cal: 47, pro: 8.5, carb: 3.5, fat: 0.1 },
+            { id: 'f27', name: 'Yogur Proteico / Griego Ligero', category: 'Grasas y Lácteos', cal: 62, pro: 10, carb: 4, fat: 0.5 },
+            { id: 'f28', name: 'Leche Semidesnatada / Bebida Soja', category: 'Grasas y Lácteos', cal: 46, pro: 3.2, carb: 4.8, fat: 1.6 },
+            { id: 'f29', name: 'Plátano de Canarias', category: 'Frutas y Verduras', cal: 89, pro: 1.1, carb: 22.8, fat: 0.3 },
+            { id: 'f30', name: 'Manzana / Pera', category: 'Frutas y Verduras', cal: 52, pro: 0.3, carb: 14, fat: 0.2 },
+            { id: 'f31', name: 'Fresas / Arándanos', category: 'Frutas y Verduras', cal: 33, pro: 0.7, carb: 7.7, fat: 0.3 },
+            { id: 'f32', name: 'Brócoli / Verduras Salteadas', category: 'Frutas y Verduras', cal: 34, pro: 2.8, carb: 6.6, fat: 0.4 }
+        ];
+
+        // Las 6 comidas solicitadas para el flujo diario en España/Hispanoamérica
+        const MEAL_SECTIONS = [
+            { key: 'desayuno', title: 'Desayuno', icon: 'ph-sun-horizon', color: 'text-ios-orange', bg: 'bg-ios-orange/15' },
+            { key: 'almuerzo', title: 'Almuerzo', icon: 'ph-coffee', color: 'text-ios-teal', bg: 'bg-ios-teal/15' },
+            { key: 'comida', title: 'Comida', icon: 'ph-sun', color: 'text-ios-green', bg: 'bg-ios-green/15' },
+            { key: 'merienda', title: 'Merienda', icon: 'ph-barbell', color: 'text-ios-pink', bg: 'bg-ios-pink/15' },
+            { key: 'cena', title: 'Cena', icon: 'ph-moon-stars', color: 'text-ios-purple', bg: 'bg-ios-purple/15' },
+            { key: 'snacks', title: 'Snacks', icon: 'ph-cookie', color: 'text-ios-blue', bg: 'bg-ios-blue/15' }
+        ];
+
+        const STORAGE_KEY = 'nutritrack_pro_v1';
+
+        let state = {
+            targets: { cal: 2200, pro: 160, carb: 220, fat: 75 },
+            profile: { formula: 'mifflin', gender: 'male', age: 28, weight: 75, height: 175, activity: '1.55', goal: '0' },
+            meals: { desayuno: [], almuerzo: [], comida: [], merienda: [], cena: [], snacks: [] },
+            customFoods: [],
+            userApiKey: ''
+        };
+
+        let activeCategory = 'all';
+        let selectedFoodForSheet = null;
+
+        // Variables de estado para funciones de Gemini IA
+        const apiKey = ""; // El entorno Canvas inyecta la clave automáticamente si está vacía
+        let aiScannedImageBase64 = null;
+        let aiScannedImageMime = "image/jpeg";
+        let lastAIScannedItems = [];
+        let lastAIChefRecipes = [];
+        let lastCoachAdviceText = "";
+
+        function getEffectiveApiKey() {
+            return (state.userApiKey && state.userApiKey.trim() !== '') ? state.userApiKey.trim() : apiKey;
+        }
+
+        function saveUserApiKey() {
+            const val = document.getElementById('user-gemini-key').value.trim();
+            state.userApiKey = val;
+            saveState();
+            updateApiKeyBadge();
+            showToast(val ? 'API Key guardada en tu iPhone' : 'Usando clave por defecto');
+        }
+
+        function updateApiKeyBadge() {
+            const badge = document.getElementById('api-key-status');
+            const input = document.getElementById('user-gemini-key');
+            if (!badge || !input) return;
+            input.value = state.userApiKey || '';
+            if (state.userApiKey) {
+                badge.textContent = 'Clave Personal Activa';
+                badge.className = 'text-[10px] font-semibold px-2 py-0.5 rounded-full bg-ios-purple/20 text-ios-purple';
+            } else {
+                badge.textContent = 'Lista en Canvas';
+                badge.className = 'text-[10px] font-semibold px-2 py-0.5 rounded-full bg-ios-green/15 text-ios-green';
+            }
+        }
+
+        // Llamada a Gemini con reintentos exponenciales (Exponential Backoff)
+        async function callGeminiAPI(payload, model = 'gemini-3-flash-preview') {
+            const key = getEffectiveApiKey();
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
+            const delays = [1000, 2000, 4000];
+
+            for (let attempt = 0; attempt <= delays.length; attempt++) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    return await response.json();
+                } catch (err) {
+                    if (attempt === delays.length) throw err;
+                    await new Promise(res => setTimeout(res, delays[attempt]));
+                }
+            }
+        }
+
+        // Función 1: Escáner Nutricional IA (Lenguaje natural + Visión por foto con JSON Schema)
+        function handleAIImageUpload(e) {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            aiScannedImageMime = file.type || 'image/jpeg';
+            const reader = new FileReader();
+            reader.onload = () => {
+                const dataUrl = reader.result;
+                aiScannedImageBase64 = dataUrl.split(',')[1];
+                document.getElementById('ai-image-preview').src = dataUrl;
+                document.getElementById('ai-image-preview-wrap').classList.remove('hidden');
+                document.getElementById('btn-clear-ai-img').classList.remove('hidden');
+                document.getElementById('ai-photo-label').textContent = 'Foto cargada lista';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearAIImage() {
+            aiScannedImageBase64 = null;
+            document.getElementById('ai-scan-image').value = '';
+            document.getElementById('ai-image-preview-wrap').classList.add('hidden');
+            document.getElementById('btn-clear-ai-img').classList.add('hidden');
+            document.getElementById('ai-photo-label').textContent = 'Hacer foto / Elegir imagen';
+        }
+
+        async function analyzeMealWithGemini() {
+            const promptText = document.getElementById('ai-scan-prompt').value.trim();
+            if (!promptText && !aiScannedImageBase64) {
+                showToast('Escribe tu comida o añade una foto');
+                return;
+            }
+
+            const btn = document.getElementById('btn-run-ai-scan');
+            const originalHTML = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<i class="ph-bold ph-spinner animate-spin text-base"></i><span>Analizando con Gemini...</span>`;
+
+            try {
+                const userParts = [];
+                if (promptText) {
+                    userParts.push({ text: `Analiza esta comida descrita por el usuario: "${promptText}".` });
+                } else {
+                    userParts.push({ text: "Identifica todos los alimentos visibles en esta imagen, estima su peso en gramos y calcula sus calorías y macronutrientes." });
+                }
+
+                if (aiScannedImageBase64) {
+                    userParts.push({
+                        inlineData: {
+                            mimeType: aiScannedImageMime,
+                            data: aiScannedImageBase64
+                        }
+                    });
+                }
+
+                const payload = {
+                    contents: [{ role: 'user', parts: userParts }],
+                    systemInstruction: {
+                        parts: [{ text: "Eres un nutricionista deportivo experto en gastronomía de España y Latinoamérica. Desglosa los alimentos detectados con estimaciones realistas de peso en gramos y sus valores nutricionales exactos para esa porción total." }]
+                    },
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "OBJECT",
+                            properties: {
+                                items: {
+                                    type: "ARRAY",
+                                    items: {
+                                        type: "OBJECT",
+                                        properties: {
+                                            name: { type: "STRING" },
+                                            grams: { type: "NUMBER" },
+                                            cal: { type: "NUMBER" },
+                                            pro: { type: "NUMBER" },
+                                            carb: { type: "NUMBER" },
+                                            fat: { type: "NUMBER" }
+                                        },
+                                        propertyOrdering: ["name", "grams", "cal", "pro", "carb", "fat"]
+                                    }
+                                }
+                            },
+                            propertyOrdering: ["items"]
+                        }
+                    }
+                };
+
+                const result = await callGeminiAPI(payload, 'gemini-3-flash-preview');
+                const rawJson = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!rawJson) throw new Error('Respuesta vacía');
+
+                const parsed = JSON.parse(rawJson);
+                lastAIScannedItems = parsed.items || [];
+                renderAIScannedItems();
+                showToast('Comida analizada con éxito');
+            } catch (err) {
+                console.error(err);
+                showToast('Error al conectar con Gemini IA');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHTML;
+            }
+        }
+
+        function renderAIScannedItems() {
+            const container = document.getElementById('ai-scan-results');
+            const listEl = document.getElementById('ai-scan-items-list');
+            const badge = document.getElementById('ai-scan-total-badge');
+
+            if (!lastAIScannedItems.length) {
+                container.classList.add('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            const totalKcal = Math.round(lastAIScannedItems.reduce((a, b) => a + (b.cal || 0), 0));
+            badge.textContent = `${totalKcal} kcal totales`;
+
+            listEl.innerHTML = lastAIScannedItems.map((it, idx) => `
+                <div class="bg-ios-card2 rounded-xl p-2.5 flex items-center justify-between gap-2 border border-white/5">
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-bold text-white truncate">${it.name}</span>
+                            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-ios-purple/20 text-ios-purple">${Math.round(it.grams)}g</span>
+                        </div>
+                        <div class="text-[11px] text-ios-gray mt-0.5">
+                            <strong class="text-ios-green">${Math.round(it.cal)} kcal</strong> · P:${Math.round(it.pro * 10) / 10}g · C:${Math.round(it.carb * 10) / 10}g · G:${Math.round(it.fat * 10) / 10}g
+                        </div>
+                    </div>
+                    <button onclick="removeAIScannedItem(${idx})" class="text-ios-gray hover:text-ios-red p-1">
+                        <i class="ph-fill ph-x-circle text-base"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function removeAIScannedItem(idx) {
+            lastAIScannedItems.splice(idx, 1);
+            renderAIScannedItems();
+        }
+
+        function confirmAddAIScannedItems() {
+            if (!lastAIScannedItems.length) return;
+            const mealKey = document.getElementById('ai-scan-meal').value;
+            if (!state.meals[mealKey]) state.meals[mealKey] = [];
+
+            lastAIScannedItems.forEach(it => {
+                state.meals[mealKey].push({
+                    uid: 'ai_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+                    foodId: 'ai_custom',
+                    name: `✨ ${it.name}`,
+                    grams: Math.round(it.grams || 100),
+                    cal: Math.round(it.cal || 0),
+                    pro: Math.round((it.pro || 0) * 10) / 10,
+                    carb: Math.round((it.carb || 0) * 10) / 10,
+                    fat: Math.round((it.fat || 0) * 10) / 10
+                });
+            });
+
+            saveState();
+            updateDashboard();
+            renderMeals();
+            lastAIScannedItems = [];
+            document.getElementById('ai-scan-prompt').value = '';
+            clearAIImage();
+            document.getElementById('ai-scan-results').classList.add('hidden');
+            closeSheet('sheet-ai-scanner');
+            showToast('Alimentos IA añadidos a tu registro');
+        }
+
+        // Función 2: Chef Inteligente IA para cuadrar los macros restantes del día
+        function getRemainingMacros() {
+            let c = 0, p = 0, cb = 0, f = 0;
+            Object.values(state.meals).forEach(list => {
+                (list || []).forEach(i => { c += i.cal; p += i.pro; cb += i.carb; f += i.fat; });
+            });
+            return {
+                cal: Math.max(150, Math.round(state.targets.cal - c)),
+                pro: Math.max(10, Math.round(state.targets.pro - p)),
+                carb: Math.max(10, Math.round(state.targets.carb - cb)),
+                fat: Math.max(5, Math.round(state.targets.fat - f))
+            };
+        }
+
+        function openAIChefSheet() {
+            const rem = getRemainingMacros();
+            document.getElementById('chef-remaining-subtitle').textContent = `Objetivo restante: ${rem.cal} kcal · P:${rem.pro}g · C:${rem.carb}g · G:${rem.fat}g`;
+            openSheet('sheet-ai-chef');
+        }
+
+        async function generateChefSuggestions() {
+            const rem = getRemainingMacros();
+            const prefs = document.getElementById('ai-chef-prefs').value.trim();
+            const btn = document.getElementById('btn-run-ai-chef');
+            const originalHTML = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<i class="ph-bold ph-spinner animate-spin text-sm"></i><span>Diseñando recetas a medida...</span>`;
+
+            try {
+                const prompt = `Me faltan por consumir hoy aproximadamente ${rem.cal} kcal, ${rem.pro}g de proteína, ${rem.carb}g de carbohidratos y ${rem.fat}g de grasas. ${prefs ? `Preferencia del usuario: ${prefs}.` : ''} Propón 3 ideas de comidas o platos sencillos con cantidades exactas en gramos que se acerquen a esos macros.`;
+
+                const payload = {
+                    contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                    systemInstruction: {
+                        parts: [{ text: "Eres un chef fitness español. Crea 3 platos deliciosos, rápidos y realistas que cuadren los macronutrientes solicitados." }]
+                    },
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "OBJECT",
+                            properties: {
+                                recipes: {
+                                    type: "ARRAY",
+                                    items: {
+                                        type: "OBJECT",
+                                        properties: {
+                                            title: { type: "STRING" },
+                                            description: { type: "STRING" },
+                                            grams: { type: "NUMBER" },
+                                            cal: { type: "NUMBER" },
+                                            pro: { type: "NUMBER" },
+                                            carb: { type: "NUMBER" },
+                                            fat: { type: "NUMBER" }
+                                        },
+                                        propertyOrdering: ["title", "description", "grams", "cal", "pro", "carb", "fat"]
+                                    }
+                                }
+                            },
+                            propertyOrdering: ["recipes"]
+                        }
+                    }
+                };
+
+                const result = await callGeminiAPI(payload, 'gemini-3-flash-preview');
+                const rawJson = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+                const parsed = JSON.parse(rawJson);
+                lastAIChefRecipes = parsed.recipes || [];
+
+                const container = document.getElementById('ai-chef-results');
+                container.innerHTML = lastAIChefRecipes.map((r, i) => `
+                    <div class="bg-ios-card2 rounded-2xl p-3.5 border border-white/10 space-y-2">
+                        <div class="flex items-start justify-between gap-2">
+                            <h4 class="text-xs font-extrabold text-white">${r.title}</h4>
+                            <span class="text-xs font-extrabold text-ios-green shrink-0">${Math.round(r.cal)} kcal</span>
+                        </div>
+                        <p class="text-[11px] text-slate-300 leading-snug">${r.description}</p>
+                        <div class="flex items-center justify-between pt-1 border-t border-ios-sep/50">
+                            <span class="text-[10px] text-ios-gray font-semibold">
+                                P: <strong class="text-ios-pink">${Math.round(r.pro)}g</strong> · 
+                                C: <strong class="text-ios-blue">${Math.round(r.carb)}g</strong> · 
+                                G: <strong class="text-ios-orange">${Math.round(r.fat)}g</strong>
+                            </span>
+                            <button onclick="addChefRecipeToMeal(${i})" class="ios-press px-2.5 py-1 rounded-lg bg-ios-green text-black font-bold text-[11px]">
+                                + Registrar plato
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error(e);
+                showToast('No se pudieron generar recetas');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHTML;
+            }
+        }
+
+        function addChefRecipeToMeal(idx) {
+            const r = lastAIChefRecipes[idx];
+            if (!r) return;
+            const mealKey = document.getElementById('quick-meal-selector').value || 'cena';
+            state.meals[mealKey].push({
+                uid: 'chef_' + Date.now(),
+                foodId: 'chef_ai',
+                name: `👨‍🍳 ${r.title}`,
+                grams: Math.round(r.grams || 300),
+                cal: Math.round(r.cal),
+                pro: Math.round(r.pro * 10) / 10,
+                carb: Math.round(r.carb * 10) / 10,
+                fat: Math.round(r.fat * 10) / 10
+            });
+            saveState();
+            updateDashboard();
+            renderMeals();
+            closeSheet('sheet-ai-chef');
+            showToast(`Receta añadida a ${mealKey}`);
+        }
+
+        // Función 3: Coach Nutricional IA + Voz Neural (Gemini TTS)
+        async function getAICoachFeedback() {
+            const btn = document.getElementById('btn-ai-coach');
+            const box = document.getElementById('ai-coach-box');
+            const textEl = document.getElementById('ai-coach-text');
+
+            btn.disabled = true;
+            btn.innerHTML = `<i class="ph-bold ph-spinner animate-spin"></i> Analizando...`;
+
+            try {
+                let c = 0, p = 0, cb = 0, f = 0;
+                Object.values(state.meals).forEach(list => {
+                    (list || []).forEach(i => { c += i.cal; p += i.pro; cb += i.carb; f += i.fat; });
+                });
+
+                const prompt = `Resumen de hoy del usuario: Consumido ${Math.round(c)} kcal de ${state.targets.cal} kcal meta. Proteína: ${Math.round(p)}g/${state.targets.pro}g, Carbos: ${Math.round(cb)}g/${state.targets.carb}g, Grasas: ${Math.round(f)}g/${state.targets.fat}g. Dame un consejo ultra breve (máximo 2 frases motivadoras y prácticas en español de España) sobre cómo va mi día y qué priorizar en la siguiente comida.`;
+
+                const payload = {
+                    contents: [{ role: 'user', parts: [{ text: prompt }] }]
+                };
+
+                const result = await callGeminiAPI(payload, 'gemini-3-flash-preview');
+                const advice = result?.candidates?.[0]?.content?.parts?.[0]?.text || 'Sigue registrando tus comidas para recibir consejos personalizados.';
+                lastCoachAdviceText = advice;
+                textEl.textContent = advice;
+                box.classList.remove('hidden');
+            } catch (e) {
+                showToast('Error al consultar al Coach IA');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="ph-fill ph-magic-wand"></i> Evaluar mi día`;
+            }
+        }
+
+        // Conversión de PCM16 de Gemini TTS a contenedor WAV reproducible en iOS Safari
+        function base64ToArrayBuffer(base64) {
+            const binaryString = atob(base64);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+
+        function pcmToWav(pcm16, sampleRate = 24000) {
+            const buffer = new ArrayBuffer(44 + pcm16.length * 2);
+            const view = new DataView(buffer);
+            const writeStr = (offset, str) => {
+                for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+            };
+            writeStr(0, 'RIFF');
+            view.setUint32(4, 36 + pcm16.length * 2, true);
+            writeStr(8, 'WAVE');
+            writeStr(12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, 1, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * 2, true);
+            view.setUint16(32, 2, true);
+            view.setUint16(34, 16, true);
+            writeStr(36, 'data');
+            view.setUint32(40, pcm16.length * 2, true);
+            for (let i = 0; i < pcm16.length; i++) {
+                view.setInt16(44 + i * 2, pcm16[i], true);
+            }
+            return new Blob([buffer], { type: 'audio/wav' });
+        }
+
+        async function speakCoachFeedback() {
+            if (!lastCoachAdviceText) return;
+            const btn = document.getElementById('btn-tts-coach');
+            const orig = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<i class="ph-bold ph-spinner animate-spin"></i> Voz IA...`;
+
+            try {
+                const payload = {
+                    contents: [{ parts: [{ text: `Di con tono cercano, enérgico y motivador de entrenador personal: ${lastCoachAdviceText}` }] }],
+                    generationConfig: {
+                        responseModalities: ["AUDIO"],
+                        speechConfig: {
+                            voiceConfig: {
+                                prebuiltVoiceConfig: { voiceName: "Puck" }
+                            }
+                        }
+                    },
+                    model: "gemini-2.5-flash-preview-tts"
+                };
+
+                const result = await callGeminiAPI(payload, 'gemini-2.5-flash-preview-tts');
+                const part = result?.candidates?.[0]?.content?.parts?.[0];
+                const audioData = part?.inlineData?.data;
+                const mimeType = part?.inlineData?.mimeType || "audio/L16;rate=24000";
+
+                if (audioData) {
+                    const rateMatch = mimeType.match(/rate=(\d+)/);
+                    const sampleRate = rateMatch ? parseInt(rateMatch[1], 10) : 24000;
+                    const pcmBuffer = base64ToArrayBuffer(audioData);
+                    const pcm16 = new Int16Array(pcmBuffer);
+                    const wavBlob = pcmToWav(pcm16, sampleRate);
+                    const audioUrl = URL.createObjectURL(wavBlob);
+                    const audio = new Audio(audioUrl);
+                    audio.play();
+                }
+            } catch (e) {
+                console.error(e);
+                showToast('No se pudo reproducir el audio IA');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = orig;
+            }
+        }
+
+        function loadState() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    state = {
+                        ...state,
+                        ...parsed,
+                        targets: { ...state.targets, ...(parsed.targets || {}) },
+                        meals: {
+                            desayuno: [], almuerzo: [], comida: [], merienda: [], cena: [], snacks: [],
+                            ...(parsed.meals || {})
+                        },
+                        customFoods: parsed.customFoods || []
+                    };
+                }
+            } catch (e) {
+                console.error('Error cargando localStorage:', e);
+            }
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            } catch (e) {
+                console.error('Error guardando localStorage:', e);
+            }
+        }
+
+        function getAllFoods() {
+            return [...state.customFoods, ...DEFAULT_FOODS];
+        }
+
+        // Navegación entre las 4 pestañas de la Tab Bar de iOS
+        function switchTab(tabName) {
+            ['hoy', 'alimentos', 'objetivos', 'datos'].forEach(t => {
+                const sec = document.getElementById(`tab-${t}`);
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (t === tabName) {
+                    sec.classList.remove('hidden');
+                    btn.classList.remove('text-ios-gray');
+                    btn.classList.add('text-ios-green');
+                } else {
+                    sec.classList.add('hidden');
+                    btn.classList.remove('text-ios-green');
+                    btn.classList.add('text-ios-gray');
+                }
+            });
+
+            if (tabName === 'objetivos') {
+                document.getElementById('target-input-cal').value = state.targets.cal;
+                document.getElementById('target-input-pro').value = state.targets.pro;
+                document.getElementById('target-input-carb').value = state.targets.carb;
+                document.getElementById('target-input-fat').value = state.targets.fat;
+            }
+            if (tabName === 'datos') {
+                generateExportReport();
+            }
+
+            document.getElementById('app-scroll-view').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Actualizar Anillos de Actividad de Apple y Barras
+        function updateDashboard() {
+            let totalCal = 0, totalPro = 0, totalCarb = 0, totalFat = 0, totalItems = 0;
+
+            Object.values(state.meals).forEach(list => {
+                (list || []).forEach(item => {
+                    totalCal += item.cal;
+                    totalPro += item.pro;
+                    totalCarb += item.carb;
+                    totalFat += item.fat;
+                    totalItems++;
+                });
+            });
+
+            totalCal = Math.round(totalCal);
+            totalPro = Math.round(totalPro * 10) / 10;
+            totalCarb = Math.round(totalCarb * 10) / 10;
+            totalFat = Math.round(totalFat * 10) / 10;
+
+            document.getElementById('stat-cal-consumed').textContent = totalCal;
+            document.getElementById('stat-cal-target').textContent = state.targets.cal;
+            document.getElementById('header-goal-pill').textContent = `${state.targets.cal} kcal`;
+            document.getElementById('stat-total-items').textContent = `${totalItems} ${totalItems === 1 ? 'registro' : 'registros'}`;
+
+            const diffCal = state.targets.cal - totalCal;
+            const centerVal = document.getElementById('ring-center-val');
+            const centerLbl = document.getElementById('ring-center-lbl');
+            const islandKcal = document.getElementById('island-kcal');
+
+            if (diffCal >= 0) {
+                centerVal.textContent = diffCal;
+                centerVal.className = 'text-lg font-extrabold tracking-tight text-white leading-none';
+                centerLbl.textContent = 'Restantes';
+                islandKcal.textContent = `${diffCal} kcal`;
+            } else {
+                centerVal.textContent = `+${Math.abs(diffCal)}`;
+                centerVal.className = 'text-lg font-extrabold tracking-tight text-ios-red leading-none';
+                centerLbl.textContent = 'Excedidas';
+                islandKcal.textContent = `+${Math.abs(diffCal)} kcal`;
+            }
+
+            // Actualizar los 3 anillos concéntricos SVG
+            setRingProgress('ring-cal', totalCal, state.targets.cal, 364.42);
+            setRingProgress('ring-pro', totalPro, state.targets.pro, 276.46);
+            setRingProgress('ring-carb', totalCarb, state.targets.carb, 188.50);
+
+            // Reparto porcentual
+            const macroCals = (totalPro * 4) + (totalCarb * 4) + (totalFat * 9);
+            if (macroCals > 0) {
+                const pP = Math.round(((totalPro * 4) / macroCals) * 100);
+                const cP = Math.round(((totalCarb * 4) / macroCals) * 100);
+                const fP = Math.max(0, 100 - pP - cP);
+                document.getElementById('stat-macro-split').textContent = `${pP}/${cP}/${fP}%`;
+            } else {
+                document.getElementById('stat-macro-split').textContent = '0/0/0%';
+            }
+
+            updateMacroMiniCard('pro', totalPro, state.targets.pro);
+            updateMacroMiniCard('carb', totalCarb, state.targets.carb);
+            updateMacroMiniCard('fat', totalFat, state.targets.fat);
+        }
+
+        function setRingProgress(id, val, target, circumference) {
+            const el = document.getElementById(id);
+            const ratio = Math.min(val / Math.max(target, 1), 1);
+            el.style.strokeDashoffset = circumference - (ratio * circumference);
+        }
+
+        function updateMacroMiniCard(key, consumed, target) {
+            const pct = Math.round((consumed / Math.max(target, 1)) * 100);
+            document.getElementById(`stat-${key}-consumed`).textContent = consumed;
+            document.getElementById(`stat-${key}-target`).textContent = target;
+            document.getElementById(`stat-${key}-pct`).textContent = `${pct}%`;
+            document.getElementById(`bar-${key}`).style.width = `${Math.min(pct, 100)}%`;
+
+            const rem = Math.round((target - consumed) * 10) / 10;
+            const remEl = document.getElementById(`stat-${key}-rem`);
+            if (rem >= 0) {
+                remEl.textContent = `Faltan ${rem}g`;
+                remEl.className = 'text-[10px] text-ios-gray block mt-1';
+            } else {
+                remEl.textContent = `+${Math.abs(rem)}g extra`;
+                remEl.className = 'text-[10px] text-ios-red font-semibold block mt-1';
+            }
+        }
+
+        // Renderizar tarjetas de comidas en la pestaña "Hoy"
+        function renderMeals() {
+            const container = document.getElementById('meals-list-container');
+            container.innerHTML = MEAL_SECTIONS.map(sec => {
+                const items = state.meals[sec.key] || [];
+                const sCal = Math.round(items.reduce((a, b) => a + b.cal, 0));
+                const sPro = Math.round(items.reduce((a, b) => a + b.pro, 0) * 10) / 10;
+                const sCarb = Math.round(items.reduce((a, b) => a + b.carb, 0) * 10) / 10;
+                const sFat = Math.round(items.reduce((a, b) => a + b.fat, 0) * 10) / 10;
+
+                return `
+                <div class="bg-ios-card rounded-[22px] p-3.5 border border-white/5 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-2xl ${sec.bg} ${sec.color} flex items-center justify-center shrink-0">
+                                <i class="ph-fill ${sec.icon} text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-[15px] font-bold text-white leading-tight">${sec.title}</h3>
+                                <p class="text-xs text-ios-gray mt-0.5">
+                                    <span class="text-white font-semibold">${sCal} kcal</span> • P ${sPro}g · C ${sCarb}g · G ${sFat}g
+                                </p>
+                            </div>
+                        </div>
+                        <button onclick="quickAddForMeal('${sec.key}')" class="ios-press w-8 h-8 rounded-full bg-ios-green/15 text-ios-green flex items-center justify-center" title="Añadir alimento">
+                            <i class="ph-bold ph-plus text-base"></i>
+                        </button>
+                    </div>
+
+                    ${items.length > 0 ? `
+                        <div class="mt-3 pt-2.5 border-t border-ios-sep/50 divide-y divide-ios-sep/40">
+                            ${items.map(item => `
+                                <div class="py-2 flex items-center justify-between gap-2">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="text-xs font-semibold text-white truncate">${item.name}</span>
+                                            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-ios-card2 text-ios-green">${item.grams}g</span>
+                                        </div>
+                                        <div class="text-[11px] text-ios-gray mt-0.5">
+                                            <span class="text-slate-300 font-medium">${item.cal} kcal</span> · P:${item.pro}g · C:${item.carb}g · G:${item.fat}g
+                                        </div>
+                                    </div>
+                                    <button onclick="removeFoodFromMeal('${sec.key}', '${item.uid}')" class="p-1.5 text-ios-gray hover:text-ios-red transition">
+                                        <i class="ph-fill ph-minus-circle text-lg"></i>
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+                `;
+            }).join('');
+        }
+
+        function quickAddForMeal(mealKey) {
+            document.getElementById('quick-meal-selector').value = mealKey;
+            switchTab('alimentos');
+            setTimeout(() => document.getElementById('food-search').focus(), 200);
+        }
+
+        function renderFoodDatabase() {
+            const q = document.getElementById('food-search').value.trim().toLowerCase();
+            document.getElementById('clear-search').classList.toggle('hidden', q.length === 0);
+
+            const listEl = document.getElementById('food-database-list');
+            const filtered = getAllFoods().filter(f => {
+                const catOk = activeCategory === 'all' || f.category === activeCategory;
+                const searchOk = f.name.toLowerCase().includes(q) || f.category.toLowerCase().includes(q);
+                return catOk && searchOk;
+            });
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = `
+                    <div class="bg-ios-card rounded-2xl p-6 text-center space-y-2">
+                        <i class="ph ph-magnifying-glass text-3xl text-ios-gray"></i>
+                        <p class="text-xs text-ios-gray">No hay resultados para "${q}"</p>
+                        <button onclick="openSheet('sheet-custom-food')" class="ios-press px-4 py-2 rounded-full bg-ios-green/20 text-ios-green text-xs font-bold">
+                            + Crear Alimento Personalizado
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            listEl.innerHTML = filtered.map(food => `
+                <div onclick="openAddFoodSheet('${food.id}')" class="ios-press bg-ios-card hover:bg-ios-card2 rounded-2xl p-3.5 flex items-center justify-between gap-3 cursor-pointer border border-white/5">
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-1.5">
+                            <h4 class="text-sm font-semibold text-white truncate">${food.name}</h4>
+                            ${food.isCustom ? `<span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-ios-blue/20 text-ios-blue">Mío</span>` : ''}
+                        </div>
+                        <div class="flex items-center gap-2.5 mt-1 text-xs text-ios-gray">
+                            <span class="font-bold text-ios-green">${food.cal} kcal</span>
+                            <span>P: <strong class="text-ios-pink">${food.pro}g</strong></span>
+                            <span>C: <strong class="text-ios-blue">${food.carb}g</strong></span>
+                            <span>G: <strong class="text-ios-orange">${food.fat}g</strong></span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        ${food.isCustom ? `
+                            <button onclick="event.stopPropagation(); deleteCustomFood('${food.id}')" class="w-8 h-8 rounded-full bg-ios-card2 text-ios-gray hover:text-ios-red flex items-center justify-center">
+                                <i class="ph ph-trash text-sm"></i>
+                            </button>
+                        ` : ''}
+                        <div class="w-8 h-8 rounded-full bg-ios-green/15 text-ios-green flex items-center justify-center">
+                            <i class="ph-bold ph-plus"></i>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterCategory(cat) {
+            activeCategory = cat;
+            document.querySelectorAll('.cat-pill').forEach(btn => {
+                if (btn.dataset.cat === cat) {
+                    btn.className = 'cat-pill px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white text-black whitespace-nowrap transition';
+                } else {
+                    btn.className = 'cat-pill px-3.5 py-1.5 rounded-full text-xs font-semibold bg-ios-card text-ios-gray whitespace-nowrap transition';
+                }
+            });
+            renderFoodDatabase();
+        }
+
+        function clearSearch() {
+            document.getElementById('food-search').value = '';
+            renderFoodDatabase();
+        }
+
+        // Controladores de Bottom Sheets de iOS
+        function openSheet(id) {
+            const container = document.getElementById(id);
+            const backdrop = container.querySelector('.sheet-backdrop');
+            const content = container.querySelector('.sheet-content');
+            container.classList.remove('pointer-events-none');
+            requestAnimationFrame(() => {
+                backdrop.classList.remove('opacity-0');
+                backdrop.classList.add('opacity-100');
+                content.classList.remove('translate-y-full');
+                content.classList.add('translate-y-0');
+            });
+        }
+
+        function closeSheet(id) {
+            const container = document.getElementById(id);
+            const backdrop = container.querySelector('.sheet-backdrop');
+            const content = container.querySelector('.sheet-content');
+            backdrop.classList.remove('opacity-100');
+            backdrop.classList.add('opacity-0');
+            content.classList.remove('translate-y-0');
+            content.classList.add('translate-y-full');
+            setTimeout(() => {
+                container.classList.add('pointer-events-none');
+            }, 350);
+        }
+
+        function openAddFoodSheet(foodId) {
+            const food = getAllFoods().find(f => f.id === foodId);
+            if (!food) return;
+            selectedFoodForSheet = food;
+
+            document.getElementById('sheet-food-cat').textContent = food.category;
+            document.getElementById('sheet-food-title').textContent = food.name;
+            document.getElementById('sheet-food-base').textContent = `Valores por 100g: ${food.cal} kcal · P:${food.pro}g · C:${food.carb}g · G:${food.fat}g`;
+            document.getElementById('sheet-food-meal').value = document.getElementById('quick-meal-selector').value;
+            document.getElementById('sheet-food-grams').value = 100;
+
+            updateSheetPreview();
+            openSheet('sheet-add-food');
+        }
+
+        function setQuickGrams(g) {
+            document.getElementById('sheet-food-grams').value = g;
+            updateSheetPreview();
+        }
+
+        function updateSheetPreview() {
+            if (!selectedFoodForSheet) return;
+            const g = parseFloat(document.getElementById('sheet-food-grams').value) || 0;
+            const ratio = g / 100;
+            document.getElementById('preview-cal').textContent = Math.round(selectedFoodForSheet.cal * ratio);
+            document.getElementById('preview-pro').textContent = (Math.round(selectedFoodForSheet.pro * ratio * 10) / 10) + 'g';
+            document.getElementById('preview-carb').textContent = (Math.round(selectedFoodForSheet.carb * ratio * 10) / 10) + 'g';
+            document.getElementById('preview-fat').textContent = (Math.round(selectedFoodForSheet.fat * ratio * 10) / 10) + 'g';
+        }
+
+        function confirmAddFoodToMeal() {
+            if (!selectedFoodForSheet) return;
+            const mealKey = document.getElementById('sheet-food-meal').value;
+            const grams = parseFloat(document.getElementById('sheet-food-grams').value);
+            if (!grams || grams <= 0) {
+                showToast('Indica una cantidad válida', 'error');
+                return;
+            }
+
+            const ratio = grams / 100;
+            const item = {
+                uid: 'id_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+                foodId: selectedFoodForSheet.id,
+                name: selectedFoodForSheet.name,
+                grams: Math.round(grams),
+                cal: Math.round(selectedFoodForSheet.cal * ratio),
+                pro: Math.round(selectedFoodForSheet.pro * ratio * 10) / 10,
+                carb: Math.round(selectedFoodForSheet.carb * ratio * 10) / 10,
+                fat: Math.round(selectedFoodForSheet.fat * ratio * 10) / 10
+            };
+
+            if (!state.meals[mealKey]) state.meals[mealKey] = [];
+            state.meals[mealKey].push(item);
+            document.getElementById('quick-meal-selector').value = mealKey;
+
+            saveState();
+            updateDashboard();
+            renderMeals();
+            closeSheet('sheet-add-food');
+            showToast(`+${item.cal} kcal añadidas a ${mealKey}`);
+        }
+
+        function removeFoodFromMeal(mealKey, uid) {
+            state.meals[mealKey] = (state.meals[mealKey] || []).filter(i => i.uid !== uid);
+            saveState();
+            updateDashboard();
+            renderMeals();
+            showToast('Registro eliminado');
+        }
+
+        // Controlador de Objetivos y TDEE
+        function switchGoalMode(mode) {
+            const calcPanel = document.getElementById('goal-panel-calc');
+            const bCalc = document.getElementById('seg-btn-calc');
+            const bMan = document.getElementById('seg-btn-manual');
+            if (mode === 'calc') {
+                calcPanel.classList.remove('hidden');
+                bCalc.className = 'py-1.5 rounded-lg text-xs font-semibold bg-ios-card3 text-white shadow transition';
+                bMan.className = 'py-1.5 rounded-lg text-xs font-semibold text-ios-gray hover:text-white transition';
+            } else {
+                calcPanel.classList.add('hidden');
+                bMan.className = 'py-1.5 rounded-lg text-xs font-semibold bg-ios-card3 text-white shadow transition';
+                bCalc.className = 'py-1.5 rounded-lg text-xs font-semibold text-ios-gray hover:text-white transition';
+            }
+        }
+
+        function calculateTDEE() {
+            const formula = document.getElementById('tdee-formula').value;
+            const gender = document.getElementById('tdee-gender').value;
+            const age = parseFloat(document.getElementById('tdee-age').value) || 28;
+            const weight = parseFloat(document.getElementById('tdee-weight').value) || 75;
+            const height = parseFloat(document.getElementById('tdee-height').value) || 175;
+            const act = parseFloat(document.getElementById('tdee-activity').value) || 1.55;
+            const goal = parseFloat(document.getElementById('tdee-goal').value) || 0;
+
+            let bmr = 0;
+            if (formula === 'mifflin') {
+                bmr = (10 * weight) + (6.25 * height) - (5 * age) + (gender === 'male' ? 5 : -161);
+            } else {
+                bmr = gender === 'male'
+                    ? 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age)
+                    : 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
+            }
+
+            const tdee = Math.round(bmr * act);
+            const targetCal = Math.max(1200, Math.round(tdee + goal));
+            const targetPro = Math.round(weight * (goal < 0 ? 2.1 : 2.0));
+            const targetFat = Math.round(weight * 0.9);
+            const targetCarb = Math.max(50, Math.round((targetCal - (targetPro * 4) - (targetFat * 9)) / 4));
+
+            document.getElementById('target-input-cal').value = targetCal;
+            document.getElementById('target-input-pro').value = targetPro;
+            document.getElementById('target-input-carb').value = targetCarb;
+            document.getElementById('target-input-fat').value = targetFat;
+
+            showToast(`Meta sugerida: ${targetCal} kcal`);
+        }
+
+        function syncCaloriesFromMacros() {
+            const p = parseFloat(document.getElementById('target-input-pro').value) || 0;
+            const c = parseFloat(document.getElementById('target-input-carb').value) || 0;
+            const f = parseFloat(document.getElementById('target-input-fat').value) || 0;
+            document.getElementById('target-input-cal').value = Math.round((p * 4) + (c * 4) + (f * 9));
+        }
+
+        function saveTargets() {
+            state.targets = {
+                cal: parseInt(document.getElementById('target-input-cal').value) || 2000,
+                pro: parseInt(document.getElementById('target-input-pro').value) || 150,
+                carb: parseInt(document.getElementById('target-input-carb').value) || 200,
+                fat: parseInt(document.getElementById('target-input-fat').value) || 70
+            };
+            saveState();
+            updateDashboard();
+            showToast('Objetivos actualizados');
+            switchTab('hoy');
+        }
+
+        // Creación de Platos Personalizados
+        function autoCalcCustomCalories() {
+            const p = parseFloat(document.getElementById('custom-pro').value) || 0;
+            const c = parseFloat(document.getElementById('custom-carb').value) || 0;
+            const f = parseFloat(document.getElementById('custom-fat').value) || 0;
+            document.getElementById('custom-cal').value = Math.round((p * 4) + (c * 4) + (f * 9));
+        }
+
+        function saveCustomFood(e) {
+            e.preventDefault();
+            const name = document.getElementById('custom-name').value.trim();
+            if (!name) return;
+
+            const newFood = {
+                id: 'cust_' + Date.now(),
+                name,
+                category: 'Personalizado',
+                cal: Math.round(parseFloat(document.getElementById('custom-cal').value) || 0),
+                pro: Math.round((parseFloat(document.getElementById('custom-pro').value) || 0) * 10) / 10,
+                carb: Math.round((parseFloat(document.getElementById('custom-carb').value) || 0) * 10) / 10,
+                fat: Math.round((parseFloat(document.getElementById('custom-fat').value) || 0) * 10) / 10,
+                isCustom: true
+            };
+
+            state.customFoods.unshift(newFood);
+
+            if (document.getElementById('custom-add-now').checked) {
+                const mealKey = document.getElementById('quick-meal-selector').value;
+                state.meals[mealKey].push({
+                    uid: 'id_' + Date.now(),
+                    foodId: newFood.id,
+                    name: newFood.name,
+                    grams: 100,
+                    cal: newFood.cal,
+                    pro: newFood.pro,
+                    carb: newFood.carb,
+                    fat: newFood.fat
+                });
+            }
+
+            saveState();
+            renderFoodDatabase();
+            updateDashboard();
+            renderMeals();
+            closeSheet('sheet-custom-food');
+            e.target.reset();
+            showToast('Plato guardado');
+        }
+
+        function deleteCustomFood(id) {
+            state.customFoods = state.customFoods.filter(f => f.id !== id);
+            saveState();
+            renderFoodDatabase();
+            showToast('Plato eliminado');
+        }
+
+        // Exportación, Compartir nativo de iOS y Reinicio
+        function generateExportReport() {
+            const fecha = new Date().toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
+            let tCal = 0, tPro = 0, tCarb = 0, tFat = 0;
+            let txt = `🍏 NUTRITRACK PRO (${fecha.toUpperCase()})\n`;
+            txt += `─────────────────────────\n`;
+
+            MEAL_SECTIONS.forEach(sec => {
+                const list = state.meals[sec.key] || [];
+                if (list.length > 0) {
+                    const sCal = Math.round(list.reduce((a, b) => a + b.cal, 0));
+                    txt += `▸ ${sec.title.toUpperCase()} (${sCal} kcal)\n`;
+                    list.forEach(i => {
+                        txt += `  • ${i.name} (${i.grams}g): ${i.cal}kcal | P:${i.pro}g C:${i.carb}g G:${i.fat}g\n`;
+                        tCal += i.cal; tPro += i.pro; tCarb += i.carb; tFat += i.fat;
+                    });
+                }
+            });
+
+            txt += `─────────────────────────\n`;
+            txt += `🔥 Calorías: ${Math.round(tCal)} / ${state.targets.cal} kcal\n`;
+            txt += `🥩 Proteína: ${Math.round(tPro * 10) / 10}g / ${state.targets.pro}g\n`;
+            txt += `🍚 Carbos:   ${Math.round(tCarb * 10) / 10}g / ${state.targets.carb}g\n`;
+            txt += `🥑 Grasas:   ${Math.round(tFat * 10) / 10}g / ${state.targets.fat}g\n`;
+
+            document.getElementById('export-textarea').value = txt;
+        }
+
+        function copyExportText() {
+            const area = document.getElementById('export-textarea');
+            area.select();
+            document.execCommand('copy');
+            showToast('Copiado al portapapeles');
+        }
+
+        async function shareNativeiOS() {
+            generateExportReport();
+            const text = document.getElementById('export-textarea').value;
+            if (navigator.share) {
+                try {
+                    await navigator.share({ title: 'Mi Resumen NutriTrack PRO', text });
+                } catch (e) {}
+            } else {
+                copyExportText();
+            }
+        }
+
+        function downloadExportFile() {
+            generateExportReport();
+            const blob = new Blob([document.getElementById('export-textarea').value], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `nutritrack-${new Date().toISOString().slice(0, 10)}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('Archivo descargado');
+        }
+
+        function exportFullBackupJSON() {
+            const backupPayload = {
+                app: 'NutriTrack PRO iOS',
+                exportedAt: new Date().toISOString(),
+                data: state
+            };
+            const blob = new Blob([JSON.stringify(backupPayload, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `NutriTrack-Backup-${new Date().toISOString().slice(0, 10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('Backup guardado en Archivos');
+        }
+
+        function importFullBackupJSON(event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    const incoming = parsed.data || parsed;
+                    if (incoming && incoming.targets && incoming.meals) {
+                        state = {
+                            ...state,
+                            ...incoming,
+                            targets: { ...state.targets, ...(incoming.targets || {}) },
+                            meals: {
+                                desayuno: [], almuerzo: [], comida: [], merienda: [], cena: [], snacks: [],
+                                ...(incoming.meals || {})
+                            },
+                            customFoods: incoming.customFoods || []
+                        };
+                        saveState();
+                        updateDashboard();
+                        renderMeals();
+                        renderFoodDatabase();
+                        updateApiKeyBadge();
+                        generateExportReport();
+                        showToast('Copia de seguridad restaurada');
+                    } else {
+                        showToast('Archivo JSON no válido');
+                    }
+                } catch (err) {
+                    showToast('Error al leer el archivo');
+                }
+                event.target.value = '';
+            };
+            reader.readAsDataURL ? reader.readAsText(file) : null;
+        }
+
+        function copyGitHubActionWorkflow() {
+            const workflowYAML = `name: Compilar IPA para iPhone
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-ipa:
+    runs-on: macos-latest
+    steps:
+      - name: Descargar codigo
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Crear contenedor nativo iOS con Capacitor
+        run: |
+          mkdir -p www
+          cp index.html www/index.html
+          npm init -y
+          npm install @capacitor/core @capacitor/cli @capacitor/ios
+          npx cap init "NutriTrack" "com.personal.nutritrack" --web-dir www
+          npx cap add ios
+
+      - name: Compilar Xcode Archive sin firma (para Sideloadly)
+        run: |
+          cd ios/App
+          xcodebuild -project App.xcodeproj -scheme App -sdk iphoneos -configuration Release archive -archivePath $RUNNER_TEMP/App.xcarchive CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+
+      - name: Empaquetar archivo .ipa
+        run: |
+          mkdir -p $RUNNER_TEMP/Payload
+          cp -r $RUNNER_TEMP/App.xcarchive/Products/Applications/App.app $RUNNER_TEMP/Payload/
+          cd $RUNNER_TEMP
+          zip -r NutriTrack-iOS.ipa Payload
+
+      - name: Subir archivo .IPA listo para descargar en Windows
+        uses: actions/upload-artifact@v4
+        with:
+          name: NutriTrack-iPhone-IPA
+          path: \${{ runner.temp }}/NutriTrack-iOS.ipa`;
+
+            const tempArea = document.createElement('textarea');
+            tempArea.value = workflowYAML;
+            document.body.appendChild(tempArea);
+            tempArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempArea);
+            showToast('Script .yml copiado al portapapeles');
+        }
+
+        function confirmResetDay() {
+            state.meals = { desayuno: [], almuerzo: [], comida: [], merienda: [], cena: [], snacks: [] };
+            saveState();
+            updateDashboard();
+            renderMeals();
+            closeSheet('sheet-reset');
+            switchTab('hoy');
+            showToast('Día reiniciado');
+        }
+
+        // Utilidades de Interfaz iOS (Toast, Dynamic Island, Reloj y Marco Escritorio)
+        function showToast(msg) {
+            const toast = document.getElementById('ios-toast');
+            document.getElementById('ios-toast-text').textContent = msg;
+            toast.classList.remove('opacity-0', '-translate-y-3');
+            toast.classList.add('opacity-100', 'translate-y-0');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', '-translate-y-3');
+            }, 2100);
+        }
+
+        function pulseDynamicIsland() {
+            const island = document.getElementById('dynamic-island');
+            island.style.width = '190px';
+            setTimeout(() => { island.style.width = '116px'; }, 1200);
+        }
+
+        function toggleDesktopFrame() {
+            const body = document.body;
+            const btn = document.getElementById('btn-toggle-frame');
+            const shell = document.getElementById('iphone-shell');
+            if (body.classList.contains('framed-mode')) {
+                body.classList.remove('framed-mode');
+                shell.className = 'w-full max-w-2xl mx-auto h-dvh bg-black flex flex-col relative overflow-hidden';
+                btn.textContent = 'Volver a marco iPhone';
+            } else {
+                body.classList.add('framed-mode');
+                shell.className = 'w-full h-dvh bg-black flex flex-col relative overflow-hidden';
+                btn.textContent = 'Ver en pantalla completa';
+            }
+        }
+
+        function updateClockAndDate() {
+            const now = new Date();
+            const hh = String(now.getHours()).padStart(2, '0');
+            const mm = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('status-time').textContent = `${hh}:${mm}`;
+
+            const opts = { weekday: 'long', day: 'numeric', month: 'short' };
+            document.getElementById('current-date-label').textContent = now.toLocaleDateString('es-ES', opts).toUpperCase();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            updateClockAndDate();
+            setInterval(updateClockAndDate, 30000);
+            updateDashboard();
+            renderMeals();
+            renderFoodDatabase();
+            updateApiKeyBadge();
+
+            document.getElementById('food-search').addEventListener('input', renderFoodDatabase);
+        });
+    </script>
+</body>
+</html>
