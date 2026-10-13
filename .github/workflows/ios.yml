@@ -1,0 +1,54 @@
+name: Compilar IPA para iPhone
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+
+    steps:
+      - name: 1. Descargar código del repositorio
+        uses: actions/checkout@v4
+
+      - name: 2. Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 3. Crear estructura web y configurar Capacitor
+        run: |
+          mkdir -p www
+          cp index.html www/index.html
+          npm init -y
+          npm install @capacitor/core @capacitor/cli @capacitor/ios
+          npx cap init "NutriTrack PRO" "com.alex.nutritrack" --web-dir www
+          npx cap add ios
+          npx cap copy ios
+
+      - name: 4. Compilar aplicación iOS con Xcode (Sin firma previa para Sideloadly)
+        run: |
+          cd ios/App
+          xcodebuild -project App.xcodeproj \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            clean build
+
+      - name: 5. Empaquetar en archivo .ipa
+        run: |
+          mkdir -p Payload
+          cp -r ios/App/build/Build/Products/Release-iphoneos/App.app Payload/
+          zip -r NutriTrack-iOS.ipa Payload
+
+      - name: 6. Subir archivo .ipa listo para descargar
+        uses: actions/upload-artifact@v4
+        with:
+          name: NutriTrack-iPhone-IPA
+          path: NutriTrack-iOS.ipa
